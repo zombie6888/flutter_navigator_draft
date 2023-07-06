@@ -62,13 +62,25 @@ class Page1 extends StatelessWidget {
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+
+  @override
+  void initState() {
+    print('home init state');
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     print('build home');
-    return Scaffold(
+    return Scaffold(        
         appBar: AppBar(title: const Text("home")),
         body: Center(
           child: Builder(builder: (context) {

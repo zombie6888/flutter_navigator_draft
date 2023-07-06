@@ -4,12 +4,11 @@ abstract class PageTransition {
   /// Initialize a transition for a page pop or push animation.
   const PageTransition();
 
-    /// How long this transition animation lasts.
+  /// How long this transition animation lasts.
   Duration get duration;
 
   /// A builder that configures the animation.
   PageTransitionsBuilder get transitionsBuilder;
-  
 }
 
 class TransitionPage<T> extends TransitionBuilderPage<T> {
@@ -24,6 +23,8 @@ class TransitionPage<T> extends TransitionBuilderPage<T> {
     this.popTransition,
     bool maintainState = true,
     bool fullscreenDialog = false,
+    this.location = '',
+    this.routePath = '',
     bool opaque = true,
     LocalKey? key,
     String? name,
@@ -37,11 +38,13 @@ class TransitionPage<T> extends TransitionBuilderPage<T> {
           fullscreenDialog: fullscreenDialog,
           opaque: opaque,
           key: key,
-          name: name,        );
-
+          name: name,
+        );
 
   final PageTransition? pushTransition;
   final PageTransition? popTransition;
+  final String location;
+  final String routePath;
 
   @override
   PageTransition buildPushTransition(BuildContext context) {

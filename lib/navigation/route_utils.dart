@@ -60,7 +60,7 @@ class RouteUtils {
         rootStack.add(route);
       }
       final stack = rootRoute == null ? rootStack : [...rootStack, rootRoute];
-      return Routes(stack, tabIndex);
+      return Routes(stack, tabIndex: tabIndex, currentLocation: path ?? '');
     }
 
     if (branchRoutes.isNotEmpty) {
@@ -73,7 +73,7 @@ class RouteUtils {
 
       final stack =
           rootRoute == null ? branchStack : [...branchStack, rootRoute];
-      return Routes(stack, tabIndex);
+      return Routes(stack, tabIndex: tabIndex, currentLocation: path ?? '');
     }
     // if (routes.isNotEmpty) {
     //   return Routes(routes, tabIndex);
@@ -94,7 +94,7 @@ class RouteUtils {
     if (rootRoute != null && rootRoute.children.isEmpty) {
       return Routes(
           [...stack, rootRoute.copyWith(queryParams: uri?.queryParameters)],
-          selectedIndex);
+          tabIndex: selectedIndex, currentLocation: path ?? '');
     }
 
     // Добавляем роут во вложенный стек
@@ -103,12 +103,13 @@ class RouteUtils {
       if (targetRoute != null) {
         final index = stack.indexOf(targetRoute);
         final updatedNestedStack =
-            _updateNestedStack(routes, targetRoute, '/${segments[1]}', uri);     
+            _updateNestedStack(routes, targetRoute, '/${segments[1]}', uri);
 
         final targetStack = [...stack];
         targetStack[index] =
             targetStack[index].copyWith(children: updatedNestedStack);
-        return Routes(targetStack, index);
+        return Routes(targetStack,
+            tabIndex: index, currentLocation: path ?? '');
       }
     }
 
