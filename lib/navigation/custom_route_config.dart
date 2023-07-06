@@ -36,17 +36,17 @@ class CustomRouteConfig extends RouterConfig<NavigationStack> {
   CustomRouteConfig(List<RoutePath> routes)
       : super(
             routeInformationParser:
-                CustomRouteInformationParser(NavigationStack(tabRoutes)),
+                CustomRouteInformationParser(NavigationStack(routes)),
             routerDelegate:
-                TabsRouteDelegate(tabRoutes), //CustomRouteDelegate(routes),
+                TabsRouteDelegate(routes), //CustomRouteDelegate(routes),
             routeInformationProvider: CustomRouteInformationProvider());
 }
 
-final routes = [
-  const RoutePath('/', HomePage()),
-  const RoutePath('/page1', Page1()),
-  const RoutePath('/page2', Page2()),
-];
+// final routes = [
+//   const RoutePath('/', HomePage()),
+//   const RoutePath('/page1', Page1()),
+//   const RoutePath('/page2', Page2()),
+// ];
 
 final tabRoutes = List<RoutePath>.unmodifiable([
   RoutePath.nested(
@@ -61,5 +61,5 @@ final tabRoutes = List<RoutePath>.unmodifiable([
   const RoutePath('/tab1/page6', Page6())
 ]);
 
-final routeConfig = CustomRouteConfig(routes);
+final routeConfig = CustomRouteConfig(tabRoutes);
 final router = routeConfig.routerDelegate as TabsRouteDelegate;

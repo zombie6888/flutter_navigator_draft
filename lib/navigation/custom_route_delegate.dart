@@ -69,11 +69,10 @@ class TabsRouteDelegate extends RouterDelegate<NavigationStack>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin {
   TabsRouteDelegate(List<RoutePath> routes)
       : _routes = List.unmodifiable(routes);
-  // location = '';
-  NavigationStack stack = NavigationStack([]);
-  //String location;
+
+  NavigationStack stack = NavigationStack([]);  
   final List<RoutePath> _routes;
-  //int _selectedIndex = 0;
+  
   bool _fromDeepLink = true;
   int _previousIndex = 0;
 
@@ -234,8 +233,8 @@ class TabsRouteDelegate extends RouterDelegate<NavigationStack>
 
   pushNamed(String path) {
     _fromDeepLink = false;
-    final upadatedStack = RouteUtils.pushPathToStack(
-        path, _routes, stack.routes, stack.currentIndex);
+    final upadatedStack = RouteUtils.pushRouteToStack(
+        path, _routes, stack);
     setNewRoutePath(upadatedStack);
   }
 }

@@ -23,13 +23,14 @@ class RouteUtils {
     return [routeNotFoundPath];
   }
 
-  static NavigationStack uriToRoutes(String? path, List<RoutePath> routes) {
+  static NavigationStack restoreRouteStack(
+      String? location, List<RoutePath> routes) {
     assert(routes.isNotEmpty, 'route config should be not empty');
 
     final branchRoutes = routes.where((c) => c.children.isNotEmpty).toList();
     final rootRoutes = routes.where((c) => c.children.isEmpty).toList();
 
-    final uri = Uri.tryParse(path ?? '');
+    final uri = Uri.tryParse(location ?? '');
     final segments = uri?.pathSegments ?? [];
     final rootPath = segments.isNotEmpty ? '/${segments[0]}' : null;
 
@@ -62,7 +63,7 @@ class RouteUtils {
       }
       final stack = rootRoute == null ? rootStack : [...rootStack, rootRoute];
       return NavigationStack(stack,
-          currentIndex: currentIndex, currentLocation: path ?? '');
+          currentIndex: currentIndex, currentLocation: location ?? '');
     }
 
     if (branchRoutes.isNotEmpty) {
@@ -76,7 +77,7 @@ class RouteUtils {
       final stack =
           rootRoute == null ? branchStack : [...branchStack, rootRoute];
       return NavigationStack(stack,
-          currentIndex: currentIndex, currentLocation: path ?? '');
+          currentIndex: currentIndex, currentLocation: location ?? '');
     }
     // if (routes.isNotEmpty) {
     //   return Routes(routes, tabIndex);
@@ -84,35 +85,36 @@ class RouteUtils {
     return NavigationStack([routeNotFoundPath]);
   }
 
-  static NavigationStack pushPathToStack(String? path, List<RoutePath> routes,
-      List<RoutePath> stack, int selectedIndex) {
-    final uri = Uri.tryParse(path ?? '');
+  static NavigationStack pushRouteToStack(
+      String? routePath, List<RoutePath> routeList, NavigationStack stack) {
+    final uri = Uri.tryParse(routePath ?? '');
     final segments = uri?.pathSegments ?? [];
 
     final rootPath = segments.isNotEmpty ? '/${segments[0]}' : null;
-
-    final rootRoute = routes.firstWhereOrNull((e) => e.path == uri?.path);
+    final rootRoute = routeList.firstWhereOrNull((e) => e.path == uri?.path);
+    final routes = stack.routes;
 
     // Добавляем роут в рутовый стек
     if (rootRoute != null && rootRoute.children.isEmpty) {
-      return NavigationStack(
-          [...stack, rootRoute.copyWith(queryParams: uri?.queryParameters)],
-          currentIndex: selectedIndex, currentLocation: path ?? '');
+      return stack.copyWith(routes: [
+        ...routes,
+        rootRoute.copyWith(queryParams: uri?.queryParameters)
+      ], currentLocation: routePath ?? '');
     }
 
     // Добавляем роут во вложенный стек
     if (rootPath != null && segments.length > 1) {
-      final targetRoute = stack.firstWhereOrNull((e) => e.path == rootPath);
+      final targetRoute = routes.firstWhereOrNull((e) => e.path == rootPath);
       if (targetRoute != null) {
-        final index = stack.indexOf(targetRoute);
+        final index = routes.indexOf(targetRoute);
         final updatedNestedStack =
-            _updateNestedStack(routes, targetRoute, '/${segments[1]}', uri);
+            _updateNestedStack(routeList, targetRoute, '/${segments[1]}', uri);
 
-        final targetStack = [...stack];
+        final targetStack = [...routes];
         targetStack[index] =
             targetStack[index].copyWith(children: updatedNestedStack);
         return NavigationStack(targetStack,
-            currentIndex: index, currentLocation: path ?? '');
+            currentIndex: index, currentLocation: routePath ?? '');
       }
     }
 
