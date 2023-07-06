@@ -159,11 +159,11 @@ class TabsRouteDelegate extends RouterDelegate<Routes>
       pages: [
         MaterialPage(
           child: TabStackController(
-              //index: _selectedIndex,
+              index: _selectedIndex,
               builder: (context, controller) {
             print('index: ${controller.index}, $_selectedIndex');
-            controller.animateTo(_selectedIndex,
-                duration: const Duration(milliseconds: 300));
+            // controller.animateTo(_selectedIndex,
+            //     duration: const Duration(milliseconds: 300));
             return Scaffold(
               body: TabBarView(
                 controller: controller,
@@ -189,10 +189,10 @@ class TabsRouteDelegate extends RouterDelegate<Routes>
                       )
                   ],
                   selectedItemColor: Colors.amber[800],
-                  onTap: (index) {
-                    controller.animateTo(_selectedIndex,
-                        duration: const Duration(milliseconds: 300));
+                  onTap: (index) {                   
                     _selectedIndex = index;
+                     controller.animateTo(_selectedIndex,
+                        duration: const Duration(milliseconds: 300));
                     //DefaultTabController.of(context)
                     //    .animateTo(_selectedIndex);                   
                     final parentRoute = stack[_selectedIndex];
