@@ -12,16 +12,13 @@ class RoutePath {
   final WidgetBuilder? builder;
 
   String get queryString {
-    final queryMap = queryParams;
-    if (queryMap == null || queryMap.isEmpty) {
-      return '';
-    }   
-    List<String> paramsList = [];
-    for (var entry in queryMap.entries) {
-      paramsList.add('${entry.key}=${entry.value}');
-    }
-    return '?${paramsList.join('&')}';
+    final query = Uri(queryParameters: queryParams).query;
+    return query.isNotEmpty ? '?$query' : '';
   }
+
+  @override
+  bool operator ==(covariant RoutePath other) =>
+      other.path == path && other.queryString == queryString;
 
   RoutePath copyWith(
           {List<RoutePath>? children, Map<String, String>? queryParams}) =>
@@ -34,6 +31,9 @@ class RoutePath {
   RoutePath.nested(this.path, this.children,
       {this.queryParams, this.params, this.builder})
       : widget = null;
+
+  @override
+  int get hashCode => '$path$queryString'.hashCode;
 }
 
 const routeNotFoundPath = RoutePath('/', Text("route not found"));

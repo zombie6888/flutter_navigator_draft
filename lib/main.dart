@@ -20,7 +20,7 @@ class Page6 extends StatelessWidget {
               TextButton(
                   onPressed: () {
                     //Navigator.of(context).pushNamed('/page1');
-                    router.pushNamed('/tab1/page6?test=2');
+                    router.pushNamed('/tab1/page6?test=2&tre=3');
                   },
                   child: const Text("/tab1/page6?test=2", style: TextStyle(fontSize: 22)))
             ],

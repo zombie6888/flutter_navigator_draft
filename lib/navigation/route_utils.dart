@@ -23,6 +23,7 @@ class RouteUtils {
     return [routeNotFoundPath];
   }
 
+  //Возвращает конфигурацию для навигации. Вызывается системой
   static NavigationStack restoreRouteStack(
       String? location, List<RoutePath> routes) {
     assert(routes.isNotEmpty, 'route config should be not empty');
@@ -32,7 +33,7 @@ class RouteUtils {
 
     final uri = Uri.tryParse(location ?? '');
     final segments = uri?.pathSegments ?? [];
-    final rootPath = segments.isNotEmpty ? '/${segments[0]}' : null;
+    final rootPath = segments.isNotEmpty ? '/${segments[0]}' : null;    
 
     List<RoutePath> rootStack = [];
     int currentIndex = 0;
@@ -85,6 +86,7 @@ class RouteUtils {
     return NavigationStack([routeNotFoundPath]);
   }
 
+  //Возвращает конфигурацию для навигации. Вызывается приложением
   static NavigationStack pushRouteToStack(
       String? routePath, List<RoutePath> routeList, NavigationStack stack) {
     final uri = Uri.tryParse(routePath ?? '');
@@ -96,10 +98,11 @@ class RouteUtils {
 
     // Добавляем роут в рутовый стек
     if (rootRoute != null && rootRoute.children.isEmpty) {
-      return stack.copyWith(routes: [
-        ...routes,
-        rootRoute.copyWith(queryParams: uri?.queryParameters)
-      ], currentLocation: routePath ?? '');
+      final rootStack = _updateStack(
+          routeList: routeList, stack: routes, isRootStack: true, uri: uri);
+
+      return stack.copyWith(
+          routes: rootStack, currentLocation: rootStack.last.path);
     }
 
     // Добавляем роут во вложенный стек
@@ -107,8 +110,8 @@ class RouteUtils {
       final targetRoute = routes.firstWhereOrNull((e) => e.path == rootPath);
       if (targetRoute != null) {
         final index = routes.indexOf(targetRoute);
-        final updatedNestedStack =
-            _updateNestedStack(routeList, targetRoute, '/${segments[1]}', uri);
+        final updatedNestedStack = _updateStack(
+            routeList: routeList, stack: targetRoute.children, uri: uri);
 
         final targetStack = [...routes];
         targetStack[index] =
@@ -132,10 +135,15 @@ class RouteUtils {
     return stack.isNotEmpty ? [stack[0]] : [];
   }
 
-  static RoutePath? _findNestedRoute(List<RoutePath> routes, String path) {
+  // Поиск по роута в заданной конфигурации.
+  static RoutePath? _searchRoute(List<RoutePath> routeList, String path,
+      [bool searchInRootRoutes = false]) {
+    if (searchInRootRoutes) {
+      return routeList.lastWhereOrNull((e) => e.path == path);
+    }
     RoutePath? routePath;
-    for (var route in routes) {
-      final result = route.children.firstWhereOrNull((e) => e.path == path);
+    for (var route in routeList) {
+      final result = route.children.lastWhereOrNull((e) => e.path == path);
       if (result != null) {
         routePath = result;
         break;
@@ -144,30 +152,55 @@ class RouteUtils {
     return routePath;
   }
 
-  static List<RoutePath> _updateNestedStack(
-      List<RoutePath> routes, RoutePath stack, String path, Uri? uri) {
-    final nestedRoute = stack.children.firstWhereOrNull((c) => c.path == path);
-    if (nestedRoute != null) {
-      final index = stack.children.indexOf(nestedRoute);
-      final oldQuery = nestedRoute.queryString;
-      final newRoute = nestedRoute.copyWith(queryParams: uri?.queryParameters);
-      final newQuery = newRoute.queryString;
-      if (oldQuery != newQuery) {
-        return [...stack.children, newRoute];
-      }
-      final newStack =
-          stack.children.sublist(0, min(index + 1, stack.children.length));
-      newStack[index] =
-          newStack[index].copyWith(queryParams: uri?.queryParameters);
-      return newStack;
+  // Возвращает обновленный стек для вложенных роутов.
+  // Если роут найден в стеке и параметры совпадают обрезает стек(возвращает стек в котором роут последний)
+  // Если роут найден в стеке и параметры не совпадают то добавляет роут в стек как новый роут
+  // Если роут не найден в стеке то он извелкается из заданной конфигурации и добавляется в стек
+  static List<RoutePath> _updateStack(
+      {required List<RoutePath> routeList,
+      required List<RoutePath> stack,
+      bool isRootStack = false,
+      Uri? uri}) {
+    final fullPath = uri?.path ?? '';
+    final path = isRootStack ? fullPath : _getNestedPath(fullPath);
+    final curentRoute = stack.lastWhereOrNull((c) => c.path == path);
+    if (curentRoute != null) {
+      final targetRoute =
+          curentRoute.copyWith(queryParams: uri?.queryParameters);
+      return _pushOrShrinkStack(
+          stack: stack,
+          currentRoute: curentRoute,
+          targetRoute: targetRoute,
+          uri: uri);
     } else {
-      final route = _findNestedRoute(routes, path);
+      final route = _searchRoute(routeList, path, isRootStack);
       return route != null
-          ? [
-              ...stack.children,
-              route.copyWith(queryParams: uri?.queryParameters)
-            ]
-          : [...stack.children];
+          ? [...stack, route.copyWith(queryParams: uri?.queryParameters)]
+          : [...stack];
     }
+  }
+
+  static String _getNestedPath(String path)  {
+    final nestedSegments = path.split('/').sublist(2);
+    return nestedSegments.isNotEmpty ? '/${nestedSegments.join('/')}' : '';    
+  }
+    //  path.split('/').sublist(2).join('/');
+
+  // Сравнивает текущий роут и новый роут и возвращает обновленный стек
+  // Если роут найден в стеке и параметры совпадают то обрезает стек(возвращает стек в котором роут последний)
+  // Если роут найден в стеке и параметры не совпадают то добавляет роут в стек как новый роут
+  static List<RoutePath> _pushOrShrinkStack(
+      {required List<RoutePath> stack,
+      required RoutePath currentRoute,
+      required RoutePath targetRoute,
+      required Uri? uri}) {
+    if (currentRoute != targetRoute) {
+      return [...stack, targetRoute];
+    }
+    final index = stack.indexOf(targetRoute);
+    final subRoutes = stack.sublist(0, min(index + 1, stack.length));
+    subRoutes[index] =
+        subRoutes[index].copyWith(queryParams: uri?.queryParameters);
+    return subRoutes;
   }
 }
