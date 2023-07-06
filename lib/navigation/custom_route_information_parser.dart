@@ -4,21 +4,21 @@ import 'package:router_app/navigation/route_utils.dart';
 
 import 'custom_route_config.dart';
 
-class CustomRouteInformationParser extends RouteInformationParser<Routes> {
+class CustomRouteInformationParser extends RouteInformationParser<NavigationStack> {
   final List<RoutePath> _routes;
-  CustomRouteInformationParser(Routes routes) : _routes = routes.stack;
+  CustomRouteInformationParser(NavigationStack stack) : _routes = stack.routes;
 
   @override
-  Future<Routes> parseRouteInformation(
+  Future<NavigationStack> parseRouteInformation(
       RouteInformation routeInformation) async {
     return RouteUtils.uriToRoutes(routeInformation.location, _routes);
     // return RouteUtils.uriToRoutes(routeInformation.location, _routes.stack);
   }
 
   @override
-  RouteInformation? restoreRouteInformation(Routes configuration) {
+  RouteInformation? restoreRouteInformation(NavigationStack configuration) {
     final RoutePath? lastRoute =
-        configuration.stack.isNotEmpty ? configuration.stack.last : null;
+        configuration.routes.isNotEmpty ? configuration.routes.last : null;
     final isBranchRoute = lastRoute?.children.isNotEmpty ?? true;
     if (!isBranchRoute && lastRoute != null) {
       return RouteInformation(

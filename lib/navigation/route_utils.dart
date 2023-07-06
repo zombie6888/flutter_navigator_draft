@@ -6,12 +6,13 @@ import 'package:router_app/navigation/route_path.dart';
 import 'custom_route_config.dart';
 
 class RouteUtils {
-  static List<RoutePath> pathToRoutes(String? path, Routes config) {
+  static List<RoutePath> pathToRoutes(String? path, NavigationStack config) {
     final segments = Uri.tryParse(path ?? '')?.pathSegments ?? [];
-    final initialRoute = config.stack.firstWhereOrNull((r) => r.path == '/');
+    final initialRoute = config.routes.firstWhereOrNull((r) => r.path == '/');
     final List<RoutePath> routes = initialRoute != null ? [initialRoute] : [];
     for (var segment in segments) {
-      final route = config.stack.firstWhereOrNull((e) => e.path == '/$segment');
+      final route =
+          config.routes.firstWhereOrNull((e) => e.path == '/$segment');
       if (route != null) {
         routes.add(route);
       }
@@ -22,7 +23,7 @@ class RouteUtils {
     return [routeNotFoundPath];
   }
 
-  static Routes uriToRoutes(String? path, List<RoutePath> routes) {
+  static NavigationStack uriToRoutes(String? path, List<RoutePath> routes) {
     assert(routes.isNotEmpty, 'route config should be not empty');
 
     final branchRoutes = routes.where((c) => c.children.isNotEmpty).toList();
@@ -33,7 +34,7 @@ class RouteUtils {
     final rootPath = segments.isNotEmpty ? '/${segments[0]}' : null;
 
     List<RoutePath> rootStack = [];
-    int tabIndex = 0;
+    int currentIndex = 0;
 
     final rootRoute = rootRoutes
         .firstWhereOrNull((c) => c.path == uri?.path)
@@ -54,34 +55,36 @@ class RouteUtils {
                   .add(childRoute.copyWith(queryParams: uri?.queryParameters));
             }
           }
-          tabIndex = i;
+          currentIndex = i;
         }
         route = route.copyWith(children: childStack);
         rootStack.add(route);
       }
       final stack = rootRoute == null ? rootStack : [...rootStack, rootRoute];
-      return Routes(stack, tabIndex: tabIndex, currentLocation: path ?? '');
+      return NavigationStack(stack,
+          currentIndex: currentIndex, currentLocation: path ?? '');
     }
 
     if (branchRoutes.isNotEmpty) {
       final branchStack = _clearRootRoutesStack(branchRoutes);
 
-      final children = branchStack[tabIndex].children;
+      final children = branchStack[currentIndex].children;
       if (children.isNotEmpty) {
         children[0] = children[0].copyWith(queryParams: uri?.queryParameters);
       }
 
       final stack =
           rootRoute == null ? branchStack : [...branchStack, rootRoute];
-      return Routes(stack, tabIndex: tabIndex, currentLocation: path ?? '');
+      return NavigationStack(stack,
+          currentIndex: currentIndex, currentLocation: path ?? '');
     }
     // if (routes.isNotEmpty) {
     //   return Routes(routes, tabIndex);
     // }
-    return Routes([routeNotFoundPath]);
+    return NavigationStack([routeNotFoundPath]);
   }
 
-  static Routes pushPathToStack(String? path, List<RoutePath> routes,
+  static NavigationStack pushPathToStack(String? path, List<RoutePath> routes,
       List<RoutePath> stack, int selectedIndex) {
     final uri = Uri.tryParse(path ?? '');
     final segments = uri?.pathSegments ?? [];
@@ -92,9 +95,9 @@ class RouteUtils {
 
     // Добавляем роут в рутовый стек
     if (rootRoute != null && rootRoute.children.isEmpty) {
-      return Routes(
+      return NavigationStack(
           [...stack, rootRoute.copyWith(queryParams: uri?.queryParameters)],
-          tabIndex: selectedIndex, currentLocation: path ?? '');
+          currentIndex: selectedIndex, currentLocation: path ?? '');
     }
 
     // Добавляем роут во вложенный стек
@@ -108,12 +111,12 @@ class RouteUtils {
         final targetStack = [...stack];
         targetStack[index] =
             targetStack[index].copyWith(children: updatedNestedStack);
-        return Routes(targetStack,
-            tabIndex: index, currentLocation: path ?? '');
+        return NavigationStack(targetStack,
+            currentIndex: index, currentLocation: path ?? '');
       }
     }
 
-    return Routes([]);
+    return NavigationStack([]);
   }
 
   static List<RoutePath> _clearRootRoutesStack(List<RoutePath> routes) {

@@ -6,26 +6,37 @@ import 'package:router_app/navigation/route_path.dart';
 import '../main.dart';
 import 'custom_route_information_provider.dart';
 
-class Routes {
-  final List<RoutePath> stack;
-  final int tabIndex;
+class NavigationStack {
+  final List<RoutePath> routes;
+  final int currentIndex;
   final String currentLocation;
 
-  Routes(this.stack, {this.tabIndex = 0, this.currentLocation = ''});
+  NavigationStack(this.routes,
+      {this.currentIndex = 0, this.currentLocation = ''});
+
+  NavigationStack copyWith(
+          {List<RoutePath>? routes,
+          int? currentIndex,
+          String? currentLocation}) =>
+      NavigationStack(
+        routes ?? this.routes,
+        currentIndex: currentIndex ?? this.currentIndex,
+        currentLocation: currentLocation ?? this.currentLocation,
+      );
 
   RoutePath? getCurrentTabRoute() {
-    if (stack.length - 1 >= tabIndex) {
-      return stack[tabIndex];
+    if (routes.length - 1 >= currentIndex) {
+      return routes[currentIndex];
     }
     return null;
   }
 }
 
-class CustomRouteConfig extends RouterConfig<Routes> {
+class CustomRouteConfig extends RouterConfig<NavigationStack> {
   CustomRouteConfig(List<RoutePath> routes)
       : super(
             routeInformationParser:
-                CustomRouteInformationParser(Routes(tabRoutes)),
+                CustomRouteInformationParser(NavigationStack(tabRoutes)),
             routerDelegate:
                 TabsRouteDelegate(tabRoutes), //CustomRouteDelegate(routes),
             routeInformationProvider: CustomRouteInformationProvider());
