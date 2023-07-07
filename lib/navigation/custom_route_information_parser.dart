@@ -11,8 +11,7 @@ class CustomRouteInformationParser extends RouteInformationParser<NavigationStac
   @override
   Future<NavigationStack> parseRouteInformation(
       RouteInformation routeInformation) async {
-    return RouteParseUtils.restoreRouteStack(routeInformation.location, _routes);
-    // return RouteUtils.uriToRoutes(routeInformation.location, _routes.stack);
+    return RouteParseUtils(routeInformation.location).restoreRouteStack(_routes);   
   }
 
   @override

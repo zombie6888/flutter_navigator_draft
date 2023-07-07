@@ -12,9 +12,9 @@ class TabsRouteDelegate extends RouterDelegate<NavigationStack>
   TabsRouteDelegate(List<RoutePath> routes)
       : _routes = List.unmodifiable(routes);
 
-  NavigationStack stack = NavigationStack([]);  
+  NavigationStack stack = NavigationStack([]);
   final List<RoutePath> _routes;
-  
+
   bool _fromDeepLink = true;
   int _previousIndex = 0;
 
@@ -167,16 +167,15 @@ class TabsRouteDelegate extends RouterDelegate<NavigationStack>
   //может вызываться платформой(диплинк) и приложением(pushNamed)
   @override
   Future<void> setNewRoutePath(NavigationStack configuration) async {
-    print('set new route path');
     _previousIndex = stack.currentIndex;
-    stack = configuration;   
+    stack = configuration;
     notifyListeners();
   }
 
   pushNamed(String path) {
     _fromDeepLink = false;
-    final upadatedStack = RouteParseUtils.pushRouteToStack(
-        path, _routes, stack);
+    final upadatedStack =
+        RouteParseUtils(path).pushRouteToStack(_routes, stack);
     setNewRoutePath(upadatedStack);
   }
 }
