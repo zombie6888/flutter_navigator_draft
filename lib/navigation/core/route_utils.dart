@@ -1,9 +1,9 @@
 import 'dart:math';
 
 import 'package:collection/collection.dart';
-import 'package:router_app/navigation/route_path.dart';
+import 'package:router_app/navigation/core/route_path.dart';
 
-import 'custom_route_config.dart';
+import 'navigation_stack.dart';
 
 class RouteParseUtils {
   late Uri _uri;

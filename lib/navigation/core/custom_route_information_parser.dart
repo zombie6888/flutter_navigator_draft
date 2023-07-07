@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:router_app/navigation/route_path.dart';
-import 'package:router_app/navigation/route_utils.dart';
+import 'package:router_app/navigation/core/route_path.dart';
+import 'package:router_app/navigation/core/route_utils.dart';
 
-import 'custom_route_config.dart';
+import 'navigation_stack.dart';
 
 class CustomRouteInformationParser
     extends RouteInformationParser<NavigationStack> {
