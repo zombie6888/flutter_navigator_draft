@@ -25,7 +25,6 @@ class CustomRouteInformationProvider extends PlatformRouteInformationProvider {
       {RouteInformationReportingType type =
           RouteInformationReportingType.none}) {
     // TODO: implement routerReportsNewRouteInformation
-    print('routerReportsNewRouteInformation');
-    super.routerReportsNewRouteInformation(routeInformation, type: type);
+      super.routerReportsNewRouteInformation(routeInformation, type: type);
   }
 }

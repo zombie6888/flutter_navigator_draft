@@ -4,14 +4,16 @@ import 'package:router_app/navigation/route_utils.dart';
 
 import 'custom_route_config.dart';
 
-class CustomRouteInformationParser extends RouteInformationParser<NavigationStack> {
+class CustomRouteInformationParser
+    extends RouteInformationParser<NavigationStack> {
   final List<RoutePath> _routes;
   CustomRouteInformationParser(NavigationStack stack) : _routes = stack.routes;
 
   @override
   Future<NavigationStack> parseRouteInformation(
       RouteInformation routeInformation) async {
-    return RouteParseUtils(routeInformation.location).restoreRouteStack(_routes);   
+    return RouteParseUtils(routeInformation.location)
+        .restoreRouteStack(_routes);
   }
 
   @override
@@ -25,14 +27,14 @@ class CustomRouteInformationParser extends RouteInformationParser<NavigationStac
     }
     final route = configuration.getCurrentTabRoute();
     final children = route?.children ?? [];
-    var path = route?.path ?? '';
+    final path = route?.path ?? '';
     final nestedRoute = children.isNotEmpty ? children.last : null;
     final nestedPath = nestedRoute?.path ?? '';
-    if(nestedPath == '/') {
-      path = '$path${nestedRoute?.queryString ?? ''}';
+    final query = nestedRoute?.queryString ?? '';
+    if (nestedPath == '/') {
+      return RouteInformation(location:'$path$query');
     } else {
-     path = '$path$nestedPath${nestedRoute?.queryString ?? ''}';
+      return RouteInformation(location:'$path$nestedPath$query');
     }    
-    return RouteInformation(location: path);
   }
 }
