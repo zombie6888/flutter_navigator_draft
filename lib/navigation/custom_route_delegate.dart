@@ -7,64 +7,6 @@ import 'package:router_app/navigation/transitions/platform_page_factory.dart';
 import 'custom_route_config.dart';
 import 'tab_stack_controller.dart';
 
-class MyRoute extends Route {
-  MyRoute({super.settings});
-}
-
-class CustomRouteDelegate extends RouterDelegate<NavigationStack>
-    with ChangeNotifier, PopNavigatorRouterDelegateMixin {
-  CustomRouteDelegate(List<RoutePath> routes) : _routes = routes;
-  List<RoutePath> stack = [];
-  final List<RoutePath> _routes;
-
-  @override
-  Widget build(BuildContext context) {
-    final pages =
-        stack.map((p) => MaterialPage(child: p.widget ?? Container())).toList();
-
-    if (pages.isEmpty) {
-      return routeNotFoundPath.widget!;
-    }
-    return Navigator(
-      pages: pages,
-      onGenerateRoute: (settings) =>
-          MaterialPageRoute(builder: (_) => Container()),
-      onUnknownRoute: (settings) =>
-          MaterialPageRoute(builder: (_) => Container()),
-      onPopPage: (route, result) {
-        if (!route.didPop(result)) {
-          return false;
-        }
-
-        stack = [...stack]..removeLast();
-        notifyListeners();
-        return true;
-      },
-    );
-  }
-
-  @override
-  GlobalKey<NavigatorState>? get navigatorKey => GlobalKey();
-
-  @override
-  NavigationStack? get currentConfiguration => NavigationStack(stack);
-
-  @override
-  Future<void> setNewRoutePath(NavigationStack configuration) async {
-    print('set new route path');
-    stack = configuration.routes;
-    notifyListeners();
-  }
-
-  pushNamed(String path) {
-    final newStack = [
-      ...stack,
-      ...RouteUtils.pathToRoutes(path, NavigationStack(_routes))..removeAt(0)
-    ];
-    setNewRoutePath(NavigationStack(newStack));
-  }
-}
-
 class TabsRouteDelegate extends RouterDelegate<NavigationStack>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin {
   TabsRouteDelegate(List<RoutePath> routes)
@@ -233,7 +175,7 @@ class TabsRouteDelegate extends RouterDelegate<NavigationStack>
 
   pushNamed(String path) {
     _fromDeepLink = false;
-    final upadatedStack = RouteUtils.pushRouteToStack(
+    final upadatedStack = RouteParseUtils.pushRouteToStack(
         path, _routes, stack);
     setNewRoutePath(upadatedStack);
   }

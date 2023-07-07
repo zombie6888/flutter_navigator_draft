@@ -29,6 +29,27 @@ class Page6 extends StatelessWidget {
   }
 }
 
+class Page7 extends StatelessWidget {
+  const Page7({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    print('build page7');
+    return Scaffold(
+        appBar: AppBar(title: const Text("page7")),
+        body: const Center(
+          child: Column(
+            children: [
+              Text(
+                "page7",
+                style: TextStyle(fontSize: 22),
+              ),              
+            ],
+          ),
+        ));
+  }
+}
+
 class Page1 extends StatelessWidget {
   const Page1({super.key});
 
@@ -157,6 +178,12 @@ class Page4 extends StatelessWidget {
                   },
                   child:
                       const Text("to page5", style: TextStyle(fontSize: 22))),
+              TextButton(
+                  onPressed: () {                   
+                    router.pushNamed('/tab1/nestedtest/page7');
+                  },
+                  child:
+                      const Text("to page7", style: TextStyle(fontSize: 22))),        
               TextButton(
                   onPressed: () {                   
                     router.pushNamed('/tab1/page4?test=2');

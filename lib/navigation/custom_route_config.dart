@@ -55,6 +55,7 @@ final tabRoutes = List<RoutePath>.unmodifiable([
         const RoutePath('/', HomePage()),
         const RoutePath('/page4', Page4()),
         const RoutePath('/page5', Page5()),
+        const RoutePath('/nestedtest/page7', Page7()),
       ])),
   RoutePath.nested('/tab2', [const RoutePath('/page1', Page1())]),
   RoutePath.nested('/tab3', [const RoutePath('/page2', Page2())]),

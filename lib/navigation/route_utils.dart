@@ -5,24 +5,7 @@ import 'package:router_app/navigation/route_path.dart';
 
 import 'custom_route_config.dart';
 
-class RouteUtils {
-  static List<RoutePath> pathToRoutes(String? path, NavigationStack config) {
-    final segments = Uri.tryParse(path ?? '')?.pathSegments ?? [];
-    final initialRoute = config.routes.firstWhereOrNull((r) => r.path == '/');
-    final List<RoutePath> routes = initialRoute != null ? [initialRoute] : [];
-    for (var segment in segments) {
-      final route =
-          config.routes.firstWhereOrNull((e) => e.path == '/$segment');
-      if (route != null) {
-        routes.add(route);
-      }
-    }
-    if (routes.isNotEmpty) {
-      return routes;
-    }
-    return [routeNotFoundPath];
-  }
-
+class RouteParseUtils {
   //Возвращает конфигурацию для навигации. Вызывается системой
   static NavigationStack restoreRouteStack(
       String? location, List<RoutePath> routes) {
@@ -33,7 +16,7 @@ class RouteUtils {
 
     final uri = Uri.tryParse(location ?? '');
     final segments = uri?.pathSegments ?? [];
-    final rootPath = segments.isNotEmpty ? '/${segments[0]}' : null;    
+    final rootPath = segments.isNotEmpty ? '/${segments[0]}' : null;
 
     List<RoutePath> rootStack = [];
     int currentIndex = 0;
@@ -48,8 +31,9 @@ class RouteUtils {
         var route = branchRoutes[i];
         final childStack = _clearNestedStack(route.children);
         if (route.path.startsWith(rootPath)) {
-          final childRoute = route.children
-              .firstWhereOrNull((c) => c.path == '/${segments[1]}');
+          final nestedPath = _getNestedPath(uri?.path ?? '');
+          final childRoute = route.children.firstWhereOrNull(
+              (c) => c.path == nestedPath);        
           if (childRoute != null) {
             final childRouteIndex = route.children.indexOf(childRoute);
             if (childRouteIndex > 0) {
@@ -180,11 +164,10 @@ class RouteUtils {
     }
   }
 
-  static String _getNestedPath(String path)  {
+  static String _getNestedPath(String path) {
     final nestedSegments = path.split('/').sublist(2);
-    return nestedSegments.isNotEmpty ? '/${nestedSegments.join('/')}' : '';    
+    return nestedSegments.isNotEmpty ? '/${nestedSegments.join('/')}' : '';
   }
-    //  path.split('/').sublist(2).join('/');
 
   // Сравнивает текущий роут и новый роут и возвращает обновленный стек
   // Если роут найден в стеке и параметры совпадают то обрезает стек(возвращает стек в котором роут последний)
