@@ -6,7 +6,7 @@ import 'package:router_app/navigation/transitions/platform_page_factory.dart';
 
 import 'navigation_stack.dart';
 import 'route_data.dart';
-import 'tab_stack_controller.dart';
+import 'tab_stack_builder.dart';
 
 class TabsRouteDelegate extends RouterDelegate<NavigationStack>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin {
@@ -53,31 +53,30 @@ class TabsRouteDelegate extends RouterDelegate<NavigationStack>
               PlatformPageFactory.getPage(child: _createPage(context, route)),
         );
 
+    final tabRoutes = routes.where((e) => e.children.isNotEmpty);
+
     return Navigator(
         pages: [
           MaterialPage(
-            child: TabStackController(
+            child: TabStackBuilder(
                 index: _stack.currentIndex,
+                tabsLenght: tabRoutes.length,
                 builder: (context, controller) {
                   return Scaffold(
                       body: TabBarView(
                         controller: controller,
                         children: [
-                          KeepAliveWidget(
-                              key: const ValueKey('tab_1'),
-                              child: getNestedNavigator(0, context)),
-                          KeepAliveWidget(
-                              key: const ValueKey('tab_2'),
-                              child: getNestedNavigator(1, context)),
-                          KeepAliveWidget(
-                              key: const ValueKey('tab_3'),
-                              child: getNestedNavigator(2, context)),
+                          for (var i = 0; i < tabRoutes.length; i++)
+                            KeepAliveWidget(
+                                key: ValueKey('tab_stack_${i.toString()}'),
+                                child: getNestedNavigator(i, context)),                         
                         ],
                       ),
                       bottomNavigationBar: BottomNavigationBar(
                           currentIndex: selectedIndex,
+                      type : BottomNavigationBarType.fixed,
                           items: <BottomNavigationBarItem>[
-                            for (var route in routes)
+                            for (var route in tabRoutes)
                               BottomNavigationBarItem(
                                 icon: const Icon(Icons.home),
                                 label: route.path,

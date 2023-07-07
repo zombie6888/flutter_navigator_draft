@@ -17,24 +17,28 @@ class CustomTabController extends TabController {
   }
 }
 
-class TabStackController extends StatefulWidget {
+class TabStackBuilder extends StatefulWidget {
   final Widget Function(BuildContext context, TabController controller) builder;
   final int index;
-  const TabStackController(
-      {super.key, required this.builder, required this.index});
+  final int tabsLenght;
+  const TabStackBuilder(
+      {super.key,
+      required this.builder,
+      required this.index,
+      required this.tabsLenght});
 
   @override
-  State<TabStackController> createState() => _TabStackControllerState();
+  State<TabStackBuilder> createState() => _TabStackBuilderState();
 }
 
-class _TabStackControllerState extends State<TabStackController>
+class _TabStackBuilderState extends State<TabStackBuilder>
     with TickerProviderStateMixin {
   late CustomTabController controller;
 
   @override
-  void didUpdateWidget(covariant TabStackController oldWidget) {
+  void didUpdateWidget(covariant TabStackBuilder oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (controller.index != widget.index) {      
+    if (controller.index != widget.index) {
       controller.animateTo(widget.index);
     }
   }
@@ -43,9 +47,8 @@ class _TabStackControllerState extends State<TabStackController>
   void initState() {
     super.initState();
     controller = CustomTabController(
-      initialIndex: widget.index,
-      //animationDuration: const Duration(milliseconds: 100),
-      length: 3,
+      initialIndex: widget.index,      
+      length: widget.tabsLenght,
       vsync: this,
     );
   }
