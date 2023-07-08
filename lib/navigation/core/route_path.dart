@@ -2,7 +2,11 @@ import 'package:flutter/widgets.dart';
 
 class RoutePath {
   const RoutePath(this.path, this.widget,
-      {this.queryParams, this.params, this.builder, this.children = const []});
+      {this.queryParams,
+      this.params,
+      this.builder,
+      this.children = const [],
+      this.navigatorKey});
 
   final Map<String, String>? queryParams;
   final List<RoutePath> children;
@@ -10,6 +14,8 @@ class RoutePath {
   final String path;
   final Widget? widget;
   final WidgetBuilder? builder;
+
+  final GlobalKey<NavigatorState>? navigatorKey;
 
   String get queryString {
     final query = Uri(queryParameters: queryParams).query;
@@ -23,6 +29,7 @@ class RoutePath {
   RoutePath copyWith(
           {List<RoutePath>? children, Map<String, String>? queryParams}) =>
       RoutePath(path, widget,
+          navigatorKey: navigatorKey,
           queryParams: queryParams ?? this.queryParams,
           children: children ?? this.children,
           params: params,
@@ -30,7 +37,8 @@ class RoutePath {
 
   RoutePath.nested(this.path, this.children,
       {this.queryParams, this.params, this.builder})
-      : widget = null;
+      : widget = null,
+        navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   int get hashCode => '$path$queryString'.hashCode;

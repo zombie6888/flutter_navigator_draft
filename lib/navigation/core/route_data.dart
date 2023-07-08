@@ -1,26 +1,43 @@
+import 'dart:js';
+
 import 'package:flutter/widgets.dart';
 
+import 'custom_route_delegate.dart';
 import 'route_path.dart';
 
-class RouteData extends InheritedWidget {
-   const RouteData({
+class AppRouter extends InheritedWidget {
+  const AppRouter({
     super.key,
     required this.routePath,
+    required this.routerDelegate,
+    this.navigatorKey = null,
     required super.child,
   });
 
   final RoutePath routePath;
+  final GlobalKey<NavigatorState>? navigatorKey;
+  final CustomRouteDelegate routerDelegate;
 
-  static RouteData? maybeOf(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<RouteData>();
+  pushNamed(String path) {
+    routerDelegate.pushNamed(path);
   }
 
-  static RoutePath of(BuildContext context) {
-    final RouteData? result = maybeOf(context);
+  pop() {
+    final navigator = navigatorKey?.currentState;
+    assert(navigator != null, 'No navigator found');
+    navigator?.pop();
+  }
+
+  static AppRouter? maybeOf(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<AppRouter>();
+  }
+
+  static AppRouter of(BuildContext context) {
+    final AppRouter? result = maybeOf(context);
     assert(result != null, 'No FrogColor found in context');
-    return result!.routePath;
+    return result!;
   }
 
   @override
-  bool updateShouldNotify(RouteData oldWidget) => false;
+  bool updateShouldNotify(AppRouter oldWidget) => false;
 }

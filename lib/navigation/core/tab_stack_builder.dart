@@ -21,9 +21,11 @@ class TabStackBuilder extends StatefulWidget {
   final Widget Function(BuildContext context, TabController controller) builder;
   final int index;
   final int tabsLenght;
+  final Function(int index) onChangeTab;
   const TabStackBuilder(
       {super.key,
       required this.builder,
+      required this.onChangeTab,
       required this.index,
       required this.tabsLenght});
 
@@ -46,11 +48,24 @@ class _TabStackBuilderState extends State<TabStackBuilder>
   @override
   void initState() {
     super.initState();
-    controller = CustomTabController(
-      initialIndex: widget.index,      
+     controller = CustomTabController(
+      initialIndex: widget.index,
       length: widget.tabsLenght,
       vsync: this,
     );
+    controller.addListener(_onChangeTab);
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  _onChangeTab() {
+    if (controller.indexIsChanging) {
+      widget.onChangeTab(controller.index);
+    }
   }
 
   @override

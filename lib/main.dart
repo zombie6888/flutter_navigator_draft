@@ -10,7 +10,8 @@ class Page6 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print('build page6');
-    print('qery params: ${RouteData.of(context).queryParams}');
+    final router = AppRouter.of(context);
+    print('qery params: ${router.routePath.queryParams}');
     return Scaffold(
         appBar: AppBar(title: const Text("page6")),
         body: Center(
@@ -26,7 +27,42 @@ class Page6 extends StatelessWidget {
                     router.pushNamed('/tab1/page6?test=2&tre=3');
                   },
                   child: const Text("/tab1/page6?test=2",
-                      style: TextStyle(fontSize: 22)))
+                      style: TextStyle(fontSize: 22))),
+              TextButton(
+                  onPressed: () {
+                    //Navigator.of(context).pushNamed('/page1');
+                    router.pop();
+                  },
+                  child: const Text("test pop", style: TextStyle(fontSize: 22)))
+            ],
+          ),
+        ));
+  }
+}
+
+class Page8 extends StatelessWidget {
+  const Page8({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    print('build page8');
+    final router = AppRouter.of(context);
+    print('qery params: ${router.routePath.queryParams}');
+    return Scaffold(
+        appBar: AppBar(title: const Text("page8")),
+        body: Center(
+          child: Column(
+            children: [
+              const Text(
+                "page8",
+                style: TextStyle(fontSize: 22),
+              ),             
+              TextButton(
+                  onPressed: () {
+                    //Navigator.of(context).pushNamed('/page1');
+                    router.pop();
+                  },
+                  child: const Text("test pop", style: TextStyle(fontSize: 22)))
             ],
           ),
         ));
@@ -60,6 +96,7 @@ class Page1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print('build /tab2/page1');
+    final router = AppRouter.of(context);
     return Scaffold(
         appBar: AppBar(title: const Text("page1")),
         body: Center(
@@ -74,7 +111,13 @@ class Page1 extends StatelessWidget {
                     router.pushNamed('/tab3/page2');
                   },
                   child:
-                      const Text("to page2", style: TextStyle(fontSize: 22))),
+                      const Text("to page2", style: TextStyle(fontSize: 22))), 
+              TextButton(
+                  onPressed: () {
+                    router.pushNamed('/tab2/page8');
+                  },
+                  child:
+                      const Text("to page8", style: TextStyle(fontSize: 22))),                              
               TextButton(
                   onPressed: () {
                     //Navigator.of(context).pushNamed('/page1');
@@ -104,6 +147,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     print('build home');
+    final router = AppRouter.of(context);
     return Scaffold(
         appBar: AppBar(title: const Text("home")),
         body: Center(
@@ -166,6 +210,7 @@ class Page4 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print('build tab1/page4');
+    final router = AppRouter.of(context);
     return Scaffold(
         appBar: AppBar(title: const Text("tab1/page4")),
         body: Center(
@@ -193,6 +238,12 @@ class Page4 extends StatelessWidget {
                   },
                   child: const Text("to page4?test=2",
                       style: TextStyle(fontSize: 22))),
+              TextButton(
+                  onPressed: () {
+                    AppRouter.of(context).pop();
+                  },
+                  child:
+                      const Text("test pop", style: TextStyle(fontSize: 22))),
             ],
           ),
         ));

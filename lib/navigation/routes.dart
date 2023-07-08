@@ -1,11 +1,13 @@
-import 'package:router_app/navigation/core/custom_route_delegate.dart';
 import 'package:router_app/navigation/core/route_path.dart';
+import 'package:router_app/navigation/tabs_page.dart';
 
 import '../main.dart';
-import 'core/custom_route_config.dart';
+import 'core/tab_routes_config.dart';
 
-final routeConfig = CustomRouteConfig(tabRoutes);
-final router = routeConfig.routerDelegate as TabsRouteDelegate;
+final routeConfig = TabRoutesConfig(
+    tabRoutes,
+    (context, tabRoutes, view, controller) =>
+        TabsPage(tabRoutes: tabRoutes, view: view, controller: controller));
 
 final tabRoutes = List<RoutePath>.unmodifiable([
   RoutePath.nested(
@@ -16,7 +18,10 @@ final tabRoutes = List<RoutePath>.unmodifiable([
         const RoutePath('/page5', Page5()),
         const RoutePath('/nestedtest/page7', Page7()),
       ])),
-  RoutePath.nested('/tab2', [const RoutePath('/page1', Page1())]),
+  RoutePath.nested('/tab2', [
+    const RoutePath('/page1', Page1()),
+    const RoutePath('/page8', Page8()),
+  ]),
   RoutePath.nested('/tab3', [const RoutePath('/page2', Page2())]),
   const RoutePath('/tab1/page6', Page6()),
 ]);
