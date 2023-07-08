@@ -18,12 +18,12 @@ class CustomRouteInformationParser
 
   @override
   RouteInformation? restoreRouteInformation(NavigationStack configuration) {
-    final RoutePath? lastRoute =
+    final RoutePath? activeRoute =
         configuration.routes.isNotEmpty ? configuration.routes.last : null;
-    final isBranchRoute = lastRoute?.children.isNotEmpty ?? true;
-    if (!isBranchRoute && lastRoute != null) {
+    final isBranchRoute = activeRoute?.children.isNotEmpty ?? true;
+    if (!isBranchRoute && activeRoute != null) {
       return RouteInformation(
-          location: '${lastRoute.path}${lastRoute.queryString}');
+          location: '${activeRoute.path}${activeRoute.queryString}');
     }
     final route = configuration.getCurrentTabRoute();
     final children = route?.children ?? [];
