@@ -1,5 +1,3 @@
-import 'dart:js';
-
 import 'package:flutter/widgets.dart';
 
 import 'custom_route_delegate.dart';

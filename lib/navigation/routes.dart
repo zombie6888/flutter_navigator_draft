@@ -1,5 +1,4 @@
 import 'package:router_app/navigation/core/route_path.dart';
-import 'package:router_app/navigation/tabs_page.dart';
 
 import '../main.dart';
 import 'core/tab_routes_config.dart';
