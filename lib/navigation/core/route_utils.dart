@@ -58,10 +58,14 @@ class RouteParseUtils {
     if (branchRoutes.isNotEmpty) {
       final branchStack = _clearRootRoutesStack(branchRoutes);
 
-      final children = branchStack[currentIndex].children;
+      final currentBranch = branchStack[currentIndex];
+      final children = [...currentBranch.children];
       if (children.isNotEmpty) {
-        children[0] = children[0].copyWith(queryParams: _uri.queryParameters);
+        children.first =
+            children.first.copyWith(queryParams: _uri.queryParameters);
       }
+      branchStack[currentIndex] =
+          currentBranch.copyWith(children: children);
 
       final stack =
           rootRoute == null ? branchStack : [...branchStack, rootRoute];
@@ -113,10 +117,10 @@ class RouteParseUtils {
   }
 
   List<RoutePath> _clearRootRoutesStack(List<RoutePath> routes) {
-    return routes
-        .map((route) =>
-            route.copyWith(children: _clearNestedStack(route.children)))
-        .toList();
+    return [
+      ...routes.map((route) =>
+          route.copyWith(children: _clearNestedStack(route.children)))
+    ];
   }
 
   List<RoutePath> _clearNestedStack(List<RoutePath> stack) {

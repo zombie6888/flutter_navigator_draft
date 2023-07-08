@@ -1,12 +1,13 @@
 import 'package:flutter/widgets.dart';
 
 class RoutePath {
-  const RoutePath(this.path, this.widget,
+  RoutePath(this.path, this.widget,
       {this.queryParams,
       this.params,
       this.builder,
-      this.children = const [],
-      this.navigatorKey});
+      List<RoutePath> children = const [],
+      this.navigatorKey})
+      : children = List.unmodifiable(children);
 
   final Map<String, String>? queryParams;
   final List<RoutePath> children;
@@ -44,4 +45,4 @@ class RoutePath {
   int get hashCode => '$path$queryString'.hashCode;
 }
 
-const routeNotFoundPath = RoutePath('/', Text("route not found"));
+final routeNotFoundPath = RoutePath('/', const Text("route not found"));
