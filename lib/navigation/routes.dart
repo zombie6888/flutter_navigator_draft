@@ -3,11 +3,12 @@ import 'package:router_app/navigation/tabs_page.dart';
 
 import '../main.dart';
 import 'core/tab_routes_config.dart';
+import 'platform_tabs_page.dart';
 
 final routeConfig = TabRoutesConfig(
     tabRoutes,
     (context, tabRoutes, view, controller) =>
-        TabsPage(tabRoutes: tabRoutes, view: view, controller: controller));
+        PlatformTabsPage(tabRoutes: tabRoutes, view: view, controller: controller));
 
 final tabRoutes = List<RoutePath>.unmodifiable([
   RoutePath.nested(

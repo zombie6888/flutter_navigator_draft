@@ -48,7 +48,7 @@ class _TabStackBuilderState extends State<TabStackBuilder>
   @override
   void initState() {
     super.initState();
-     controller = CustomTabController(
+    controller = CustomTabController(
       initialIndex: widget.index,
       length: widget.tabsLenght,
       vsync: this,
@@ -63,8 +63,13 @@ class _TabStackBuilderState extends State<TabStackBuilder>
   }
 
   _onChangeTab() {
-    if (controller.indexIsChanging) {
-      widget.onChangeTab(controller.index);
+    // print(
+    //     '_onChangeTab ${controller.index}, ${controller.previousIndex}, ${controller.indexIsChanging}');
+    if (controller.index != controller.previousIndex) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+         widget.onChangeTab(controller.index);
+      });
+      //widget.onChangeTab(controller.index);
     }
   }
 
