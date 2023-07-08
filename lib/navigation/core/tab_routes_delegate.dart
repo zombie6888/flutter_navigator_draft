@@ -53,7 +53,6 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
 
   @override
   Widget build(BuildContext context) {
-    final selectedIndex = _stack.currentIndex;
     final routes = _stack.routes;
     if (routes.isEmpty) {
       return routeNotFoundPath.widget!;
@@ -85,27 +84,6 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
                     ],
                   );
                   return tabPageBuider(context, tabRoutes, view, controller);
-                  //     body: TabBarView(
-                  //       controller: controller,
-                  //       children: [
-                  //         for (var i = 0; i < tabRoutes.length; i++)
-                  //           KeepAliveWidget(
-                  //               key: ValueKey('tab_stack_${i.toString()}'),
-                  //               child: getNestedNavigator(i, context)),
-                  //       ],
-                  //     ),
-                  //     bottomNavigationBar: BottomNavigationBar(
-                  //         currentIndex: selectedIndex,
-                  //         type: BottomNavigationBarType.fixed,
-                  //         items: <BottomNavigationBarItem>[
-                  //           for (var route in tabRoutes)
-                  //             BottomNavigationBarItem(
-                  //               icon: const Icon(Icons.home),
-                  //               label: route.path,
-                  //             )
-                  //         ],
-                  //         selectedItemColor: Colors.amber[800],
-                  //         onTap: (index) => onPressTab(controller, index)));
                 }),
           ),
           ...pages
@@ -115,10 +93,6 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
         onUnknownRoute: (settings) =>
             MaterialPageRoute(builder: (_) => Container()),
         onPopPage: (route, result) => _onPopRootPage(route, result, pages));
-  }
-
-  void onPressTab(TabController controller, index) {
-    controller.animateTo(index, duration: const Duration(milliseconds: 300));
   }
 
   void _onChangeTab(int index) {

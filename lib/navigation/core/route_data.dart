@@ -10,7 +10,7 @@ class AppRouter extends InheritedWidget {
     super.key,
     required this.routePath,
     required this.routerDelegate,
-    this.navigatorKey = null,
+    this.navigatorKey,
     required super.child,
   });
 
