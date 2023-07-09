@@ -10,6 +10,7 @@ import 'custom_route_delegate.dart';
 import 'navigation_stack.dart';
 import 'tab_stack_builder.dart';
 
+// Builder for tabs. Provide way to 
 typedef TabPageBuilder = Widget Function(BuildContext context,
     Iterable<RoutePath> tabRoutes, TabBarView view, TabController controller);
 
