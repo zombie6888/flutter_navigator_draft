@@ -2,6 +2,11 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+/// See [RouteInformationProvider]
+///
+/// Pass [PlatformDispatcher.instance.defaultRouteName]
+/// to [RouteInformationProvider], which is providing [RouteInformation] from platform.
+/// Useful for deep link support. 
 class CustomRouteInformationProvider extends PlatformRouteInformationProvider {
   CustomRouteInformationProvider()
       : super(

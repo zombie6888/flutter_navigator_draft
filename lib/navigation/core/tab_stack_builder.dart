@@ -1,5 +1,15 @@
 import 'package:flutter/material.dart';
 
+/// Custom tab controller
+///
+/// It's a little bit hacky solution for the bug, when [TabBarView]
+/// doesn't respect [TabController.animateTo] duration
+/// It updates [animationDuration] property when
+/// [TabController.animateTo] function is called, which is the only way
+/// to control tab animation. The goal is disable animation
+/// when index was changed by router (for example you push route, which 
+/// is nested route of another tab)
+/// and keep animation remaining when index was changed by user (tapping on tab).
 class CustomTabController extends TabController {
   CustomTabController(
       {required super.length, required super.vsync, super.initialIndex});
@@ -21,11 +31,11 @@ class TabStackBuilder extends StatefulWidget {
   final Widget Function(BuildContext context, TabController controller) builder;
   final int index;
   final int tabsLenght;
-  final Function(int index) onChangeTab;
+  final Function(int index) tabIndexUpdateHandler;
   const TabStackBuilder(
       {super.key,
       required this.builder,
-      required this.onChangeTab,
+      required this.tabIndexUpdateHandler,
       required this.index,
       required this.tabsLenght});
 
@@ -63,13 +73,10 @@ class _TabStackBuilderState extends State<TabStackBuilder>
   }
 
   _onChangeTab() {
-    // print(
-    //     '_onChangeTab ${controller.index}, ${controller.previousIndex}, ${controller.indexIsChanging}');
     if (controller.index != controller.previousIndex) {
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-         widget.onChangeTab(controller.index);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        widget.tabIndexUpdateHandler(controller.index);
       });
-      //widget.onChangeTab(controller.index);
     }
   }
 

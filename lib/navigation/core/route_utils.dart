@@ -5,6 +5,7 @@ import 'package:router_app/navigation/core/route_path.dart';
 
 import 'navigation_stack.dart';
 
+/// Utility class, which is using to parse route path [uri] to navigation stack
 class RouteParseUtils {
   late Uri _uri;
   RouteParseUtils(String? path) {
@@ -15,7 +16,10 @@ class RouteParseUtils {
   String? get rootPath =>
       _uri.pathSegments.isNotEmpty ? '/${_uri.pathSegments[0]}' : null;
 
-  //Возвращает конфигурацию для навигации. Вызывается системой
+  /// Returns updated configaration [NavigationStack]
+  ///
+  /// Takes [routes] from [RouteInformationParser]
+  /// and return updated navigation stack. Called by platform.
   NavigationStack restoreRouteStack(List<RoutePath> routes) {
     assert(routes.isNotEmpty, 'route config should be not empty');
 
@@ -29,11 +33,11 @@ class RouteParseUtils {
         .firstWhereOrNull((c) => c.path == _uri.path)
         ?.copyWith(queryParams: _uri.queryParameters);
 
-    // вложенный стек
+    // nested stack
     if (rootPath != null && _uri.pathSegments.length > 1) {
       for (var i = 0; i < branchRoutes.length; i++) {
         var route = branchRoutes[i];
-        final childStack = _clearNestedStack(route.children);
+        final childStack = _resetStack(route.children);
         if (route.path.startsWith(rootPath ?? '')) {
           final nestedPath = _getNestedPath(_uri.path);
           final childRoute =
@@ -55,6 +59,7 @@ class RouteParseUtils {
           currentIndex: currentIndex, currentLocation: _uri.path);
     }
 
+    // root stack
     if (branchRoutes.isNotEmpty) {
       final branchStack = _clearRootRoutesStack(branchRoutes);
 
@@ -64,8 +69,7 @@ class RouteParseUtils {
         children.first =
             children.first.copyWith(queryParams: _uri.queryParameters);
       }
-      branchStack[currentIndex] =
-          currentBranch.copyWith(children: children);
+      branchStack[currentIndex] = currentBranch.copyWith(children: children);
 
       final stack =
           rootRoute == null ? branchStack : [...branchStack, rootRoute];
@@ -78,7 +82,10 @@ class RouteParseUtils {
     return NavigationStack([routeNotFoundPath]);
   }
 
-  //Возвращает конфигурацию для навигации. Вызывается приложением
+  /// Returns updated configaration [NavigationStack]
+  ///
+  /// Takes [routeList] and current [stack] from [RouterDelegate]
+  /// and return updated navigation stack. Called by [CustomRouteDelegate.pushNamed].
   NavigationStack pushRouteToStack(
       List<RoutePath> routeList, NavigationStack stack) {
     // final uri = Uri.tryParse(routePath ?? '');
@@ -88,7 +95,7 @@ class RouteParseUtils {
     final rootRoute = routeList.firstWhereOrNull((e) => e.path == _uri.path);
     final routes = stack.routes;
 
-    // Добавляем роут в рутовый стек
+    // add route to root stack
     if (rootRoute != null && rootRoute.children.isEmpty) {
       final rootStack =
           _updateStack(routeList: routeList, stack: routes, isRootStack: true);
@@ -97,7 +104,7 @@ class RouteParseUtils {
           routes: rootStack, currentLocation: rootStack.last.path);
     }
 
-    // Добавляем роут во вложенный стек
+    // add route to nested stack
     if (rootPath != null && _uri.pathSegments.length > 1) {
       final targetRoute = routes.firstWhereOrNull((e) => e.path == rootPath);
       if (targetRoute != null) {
@@ -116,18 +123,36 @@ class RouteParseUtils {
     return NavigationStack([]);
   }
 
+  /// Returns routes whith only first route in nested stack
+  ///
+  /// Fro example for routes:
+  /// tab1
+  ///   --page1
+  ///   --page2
+  ///   ...
+  /// tab2
+  ///   --page3
+  ///   --page4
+  ///   --page5
+  ///   ...
+  /// result is:
+  /// tab1
+  ///   --page1   
+  /// tab2
+  ///   --page3
   List<RoutePath> _clearRootRoutesStack(List<RoutePath> routes) {
     return [
       ...routes.map((route) =>
-          route.copyWith(children: _clearNestedStack(route.children)))
+          route.copyWith(children: _resetStack(route.children)))
     ];
   }
 
-  List<RoutePath> _clearNestedStack(List<RoutePath> stack) {
-    return stack.isNotEmpty ? [stack[0]] : [];
+  /// Return routes whith only first route in stack
+  List<RoutePath> _resetStack(List<RoutePath> stack) {
+    return stack.isNotEmpty ? [stack.first] : [];
   }
 
-  // Поиск по роута в заданной конфигурации.
+  /// Search route in [routeList] configuration
   RoutePath? _searchRoute(List<RoutePath> routeList, String path,
       [bool searchInRootRoutes = false]) {
     if (searchInRootRoutes) {
@@ -144,10 +169,24 @@ class RouteParseUtils {
     return routePath;
   }
 
-  // Возвращает обновленный стек для вложенных роутов.
-  // Если роут найден в стеке и параметры совпадают обрезает стек(возвращает стек в котором роут последний)
-  // Если роут найден в стеке и параметры не совпадают то добавляет роут в стек как новый роут
-  // Если роут не найден в стеке то он извелкается из заданной конфигурации и добавляется в стек
+  /// Returns updated route list for nested routes depending on [_uri.path]
+  /// and [_uri.queryParameters].
+
+  /// if route was found in [stack] and it has the same query parameters,
+  /// then crop stack (return stack, where route is last).
+  ///
+  /// if route was found but query parameters are different,
+  /// then adds route to stack as a new route.
+  ///
+  /// if route wasn't found in [stack], it will try to search route in [routeList]
+  /// and adds it to stack as a new route in case of success
+  ///
+  /// for example for stack:
+  ///   [page1, page2?q=1, page3]
+  /// you push "page2?q=2"
+  /// updated stack will be: [page1, page2?q=1, page3, page2?q=2]
+  /// or you push "page2?q=1"
+  /// updated stack will be: [page1, page2?q=1]
   List<RoutePath> _updateStack({
     required List<RoutePath> routeList,
     required List<RoutePath> stack,
@@ -155,13 +194,16 @@ class RouteParseUtils {
   }) {
     final fullPath = _uri.path;
     final path = isRootStack ? fullPath : _getNestedPath(fullPath);
-    final curentRoute = stack.lastWhereOrNull((c) => c.path == path);
-    if (curentRoute != null) {
+    final currentRoute = stack.lastWhereOrNull((c) => c.path == path);
+    if (currentRoute != null) {
       final targetRoute =
-          curentRoute.copyWith(queryParams: _uri.queryParameters);
-      return _pushOrShrinkStack(
+          currentRoute.copyWith(queryParams: _uri.queryParameters);
+      if (currentRoute != targetRoute) {
+        return [...stack, targetRoute];
+      }
+      return _cropStack(
         stack: stack,
-        currentRoute: curentRoute,
+        currentRoute: currentRoute,
         targetRoute: targetRoute,
       );
     } else {
@@ -172,22 +214,18 @@ class RouteParseUtils {
     }
   }
 
+  /// Returns nested path for subroutes
   String _getNestedPath(String path) {
     final nestedSegments = path.split('/').sublist(2);
     return nestedSegments.isNotEmpty ? '/${nestedSegments.join('/')}' : '';
   }
 
-  // Сравнивает текущий роут и новый роут и возвращает обновленный стек
-  // Если роут найден в стеке и параметры совпадают то обрезает стек(возвращает стек в котором роут последний)
-  // Если роут найден в стеке и параметры не совпадают то добавляет роут в стек как новый роут
-  List<RoutePath> _pushOrShrinkStack({
+  /// Returns stack, where route is last
+  List<RoutePath> _cropStack({
     required List<RoutePath> stack,
     required RoutePath currentRoute,
     required RoutePath targetRoute,
   }) {
-    if (currentRoute != targetRoute) {
-      return [...stack, targetRoute];
-    }
     final index = stack.indexOf(targetRoute);
     final subRoutes = stack.sublist(0, min(index + 1, stack.length));
     subRoutes[index] =

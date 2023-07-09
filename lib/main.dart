@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:router_app/navigation/routes.dart';
 import 'package:url_strategy/url_strategy.dart';
 
-import 'navigation/core/route_data.dart';
+import 'navigation/core/app_router.dart';
 
 class Page6 extends StatelessWidget {
   const Page6({super.key});

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+/// This widget prevents [TabBarView] from rebuilding
+/// https://github.com/flutter/flutter/issues/19116#issuecomment-403315432
 class KeepAliveWidget extends StatefulWidget {
   final Widget child;
   const KeepAliveWidget({super.key, required this.child});
