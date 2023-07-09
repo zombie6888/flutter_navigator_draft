@@ -213,7 +213,7 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
     // When pop route, which will pushed from another tab,
     // it will change active tab index to go back to previous tab
     //
-    // todo: make it optional?
+    // TODO: make it optional?
     if (!_fromDeepLink && _previousIndex != currentindex) {
       _stack = _stack.copyWith(currentIndex: _previousIndex);
       //notifyListeners();

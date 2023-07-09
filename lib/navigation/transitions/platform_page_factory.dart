@@ -63,10 +63,7 @@ class TransitionPage<T> extends TransitionBuilderPage<T> {
 
 enum AnimationDirection { left, down, up, right }
 
-// Фабрика страниц для routemaster с поддержкой разных направлений анимации
-// и жестов на ios
-//
-// todo: поменять left на right и переименовать классы так как страница выезжает справа
+// TODO: Change left to right and rename classes
 class PlatformPageFactory {
   static Page<dynamic> getPage(
       {AnimationDirection direction = AnimationDirection.left,
@@ -75,8 +72,7 @@ class PlatformPageFactory {
       String routePath = '',
       String? restorationId,
       required Widget child}) {
-    // todo: Добавить направления анимаций для ios, не поломав жест назад
-    if (!kIsWeb && Platform.isIOS) {
+      if (!kIsWeb && Platform.isIOS) {
       return CupertinoPage(child: child);
     } else {
       PageTransition transition = SlideLeftTransition();

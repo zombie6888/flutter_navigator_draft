@@ -5,7 +5,7 @@ import 'package:router_app/navigation/core/route_path.dart';
 
 import 'navigation_stack.dart';
 
-/// Utility class, which is using to parse route path [uri] to navigation stack
+/// Utility class, which is using to parse route path to navigation stack
 class RouteParseUtils {
   late Uri _uri;
   RouteParseUtils(String? path) {
@@ -18,7 +18,7 @@ class RouteParseUtils {
 
   /// Returns updated configaration [NavigationStack]
   ///
-  /// Takes [routes] from [RouteInformationParser]
+  /// Takes [routes], passed by [RouteInformationParser]
   /// and return updated navigation stack. Called by platform.
   NavigationStack restoreRouteStack(List<RoutePath> routes) {
     assert(routes.isNotEmpty, 'route config should be not empty');
@@ -76,9 +76,8 @@ class RouteParseUtils {
       return NavigationStack(stack,
           currentIndex: currentIndex, currentLocation: _uri.path);
     }
-    // if (routes.isNotEmpty) {
-    //   return Routes(routes, tabIndex);
-    // }
+
+    /// TODO: route not found functionality
     return NavigationStack([routeNotFoundPath]);
   }
 
@@ -88,10 +87,6 @@ class RouteParseUtils {
   /// and return updated navigation stack. Called by [CustomRouteDelegate.pushNamed].
   NavigationStack pushRouteToStack(
       List<RoutePath> routeList, NavigationStack stack) {
-    // final uri = Uri.tryParse(routePath ?? '');
-    // final segments = uri?.pathSegments ?? [];
-
-    // final rootPath = segments.isNotEmpty ? '/${segments[0]}' : null;
     final rootRoute = routeList.firstWhereOrNull((e) => e.path == _uri.path);
     final routes = stack.routes;
 
@@ -137,13 +132,13 @@ class RouteParseUtils {
   ///   ...
   /// result is:
   /// tab1
-  ///   --page1   
+  ///   --page1
   /// tab2
   ///   --page3
   List<RoutePath> _clearRootRoutesStack(List<RoutePath> routes) {
     return [
-      ...routes.map((route) =>
-          route.copyWith(children: _resetStack(route.children)))
+      ...routes
+          .map((route) => route.copyWith(children: _resetStack(route.children)))
     ];
   }
 
