@@ -19,7 +19,8 @@ class RouteParseUtils {
   /// Returns updated configaration [NavigationStack]
   ///
   /// Takes [routes], passed by [RouteInformationParser]
-  /// and return updated navigation stack. Called by platform.
+  /// and return updated navigation stack. Called by platform,
+  /// Deep links will be parsed here.
   NavigationStack restoreRouteStack(List<RoutePath> routes) {
     assert(routes.isNotEmpty, 'route config should be not empty');
 
@@ -33,11 +34,11 @@ class RouteParseUtils {
         .firstWhereOrNull((c) => c.path == _uri.path)
         ?.copyWith(queryParams: _uri.queryParameters);
 
-    // nested stack
+    // stack from nested uri
     if (rootPath != null && _uri.pathSegments.length > 1) {
       for (var i = 0; i < branchRoutes.length; i++) {
         var route = branchRoutes[i];
-        final childStack = _resetStack(route.children);
+        final children = _createChildStack(route.children);
         if (route.path.startsWith(rootPath ?? '')) {
           final nestedPath = _getNestedPath(_uri.path);
           final childRoute =
@@ -45,15 +46,16 @@ class RouteParseUtils {
           if (childRoute != null) {
             final childRouteIndex = route.children.indexOf(childRoute);
             if (childRouteIndex > 0) {
-              childStack
+              children
                   .add(childRoute.copyWith(queryParams: _uri.queryParameters));
             }
           }
           currentIndex = i;
         }
-        route = route.copyWith(children: childStack);
+        route = route.copyWith(children: children);
         rootStack.add(route);
       }
+
       final stack = rootRoute == null ? rootStack : [...rootStack, rootRoute];
       return NavigationStack(stack,
           currentIndex: currentIndex, currentLocation: _uri.path);
@@ -61,7 +63,7 @@ class RouteParseUtils {
 
     // root stack
     if (branchRoutes.isNotEmpty) {
-      final branchStack = _clearRootRoutesStack(branchRoutes);
+      final branchStack = _createParentStack(branchRoutes);
 
       final currentBranch = branchStack[currentIndex];
       final children = [...currentBranch.children];
@@ -118,7 +120,7 @@ class RouteParseUtils {
     return NavigationStack([]);
   }
 
-  /// Returns routes whith only first route in nested stack
+  /// Returns routes with only first route in nested stack
   ///
   /// Fro example for routes:
   /// tab1
@@ -135,17 +137,16 @@ class RouteParseUtils {
   ///   --page1
   /// tab2
   ///   --page3
-  List<RoutePath> _clearRootRoutesStack(List<RoutePath> routes) {
+  List<RoutePath> _createParentStack(List<RoutePath> routes) {
     return [
-      ...routes
-          .map((route) => route.copyWith(children: _resetStack(route.children)))
+      ...routes.map((route) =>
+          route.copyWith(children: _createChildStack(route.children)))
     ];
   }
 
-  /// Return routes whith only first route in stack
-  List<RoutePath> _resetStack(List<RoutePath> stack) {
-    return stack.isNotEmpty ? [stack.first] : [];
-  }
+  /// Return routes with only first route in stack
+  List<RoutePath> _createChildStack(List<RoutePath> routes) =>
+      routes.isNotEmpty ? [routes.first] : [];
 
   /// Search route in [routeList] configuration
   RoutePath? _searchRoute(List<RoutePath> routeList, String path,
@@ -178,9 +179,9 @@ class RouteParseUtils {
   ///
   /// for example for stack:
   ///   [page1, page2?q=1, page3]
-  /// you push "page2?q=2"
-  /// updated stack will be: [page1, page2?q=1, page3, page2?q=2]
-  /// or you push "page2?q=1"
+  /// if you push: "page2?q=2",
+  /// updated stack will be: [page1, page2?q=1, page3, page2?q=2],
+  /// or if you push: "page2?q=1",
   /// updated stack will be: [page1, page2?q=1]
   List<RoutePath> _updateStack({
     required List<RoutePath> routeList,

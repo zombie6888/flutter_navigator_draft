@@ -2,15 +2,15 @@ import 'package:flutter/widgets.dart';
 
 /// Base class for routes.
 ///
-/// Use [RoutePath.nested] constructor for child routes.
+/// Use [RoutePath.nested] constructor for netsed routes.
 /// It supports only two-level navigation but for config like this:
 /// /tab1
 ///   --page1
 ///   --page2
 /// ...
-/// Uri [path] could be like: /tab1/path/page1, /tab1/../../page2
-/// In order to get [RoutePath]
-/// from any widget, use AppRouter.of(context).routePath.
+/// Uri [path] can be like this: /tab1/path/page1, /tab1/../../page2
+/// In order to get [RoutePath] from any widget, 
+/// use AppRouter.of(context).routePath.
 class RoutePath {
   RoutePath(this.path, this.widget,
       {this.queryParams,
@@ -20,7 +20,16 @@ class RoutePath {
       this.navigatorKey})
       : children = List.unmodifiable(children);
 
-  /// takes from [Uri.queryParameters]
+  /// Constructor for nested routes. Can be used for tab navigation.
+  /// If route contains [children] property, it will be treated
+  /// as a parent route for a child stack. 
+  /// Otherwise it's just a single page route.
+  RoutePath.nested(this.path, this.children,
+      {this.queryParams, this.params, this.builder})
+      : widget = null,
+        navigatorKey = GlobalKey<NavigatorState>();    
+
+  /// Query params from [Uri.queryParameters]
   final Map<String, String>? queryParams;
 
   /// Nested routes
@@ -28,10 +37,10 @@ class RoutePath {
 
   final Map<String, String>? params;
 
-  /// Path to route like: /tab1/page1
+  /// Path to route, for example: /tab1/page1
   final String path;
 
-  /// Can use builder or Widget for page rendering
+  /// Can use builder or widget as page child
   final Widget? widget;
   final WidgetBuilder? builder;
 
@@ -55,12 +64,7 @@ class RoutePath {
           queryParams: queryParams ?? this.queryParams,
           children: children ?? this.children,
           params: params,
-          builder: builder);
-
-  RoutePath.nested(this.path, this.children,
-      {this.queryParams, this.params, this.builder})
-      : widget = null,
-        navigatorKey = GlobalKey<NavigatorState>();
+          builder: builder);  
 
   @override
   int get hashCode => '$path$queryString'.hashCode;

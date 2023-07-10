@@ -7,7 +7,7 @@ import 'navigation_stack.dart';
 /// Custom route infromation parser.
 /// 
 /// This class is using to convert [RouteInformation] to [NavigationStack], and 
-/// get back [NavigationStack] from [RouteInformation] 
+/// get back [NavigationStack] from [RouteInformation].
 /// see [RouteInformationParser]
 class CustomRouteInformationParser
     extends RouteInformationParser<NavigationStack> {

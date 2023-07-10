@@ -50,8 +50,9 @@ class _TabStackBuilderState extends State<TabStackBuilder>
 
   /// Update navigation stack when tab index was changed
   /// 
-  /// PostFrameCallback prevent update on widget's rebuild process, 
-  /// caused by tab switching. See [TabRoutesDelegate._tabIndexUpdateHandler]
+  /// PostFrameCallback prevents stack update while widgets rebuild process, 
+  /// caused by tab switching. 
+  /// See [TabRoutesDelegate._tabIndexUpdateHandler]
   _onChangeTab() {
     if (controller.index != controller.previousIndex) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -69,13 +70,16 @@ class _TabStackBuilderState extends State<TabStackBuilder>
 
 /// Custom tab controller
 ///
-/// It's a little bit hacky solution for the bug, when [TabBarView]
+/// It's a little bit hacky, but there is a bug that [TabBarView]
 /// doesn't respect [TabController.animateTo] duration
-/// It updates [animationDuration] property when
+/// 
+/// This will update [animationDuration] property when
 /// [TabController.animateTo] function is called, which is the only way
-/// to control tab animation. The goal is disable animation
+/// to control tab animation. 
+/// 
+/// The purpose of this workaround is to disable animation
 /// when index was changed by router (for example you push route, which 
-/// is nested route of another tab)
+/// is nested route of another tab), 
 /// and keep animation remaining when index was changed by user (tapping on tab).
 class CustomTabController extends TabController {
   CustomTabController(
