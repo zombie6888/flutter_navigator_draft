@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import 'custom_route_delegate.dart';
+import 'navigation_observer.dart';
 import 'route_path.dart';
 
 class AppRouter extends InheritedWidget {
@@ -15,6 +16,13 @@ class AppRouter extends InheritedWidget {
   final RoutePath routePath;
   final GlobalKey<NavigatorState>? navigatorKey;
   final CustomRouteDelegate routerDelegate;
+
+  Stream<LocationUpdateData>? get locationUpdates {
+    if (routerDelegate.observer is LocationStreamController) {
+      return (routerDelegate.observer as LocationStreamController).stream;
+    }
+    return null;
+  }
 
   pushNamed(String path) {
     routerDelegate.pushNamed(path);

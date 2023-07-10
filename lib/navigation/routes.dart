@@ -1,3 +1,4 @@
+import 'package:router_app/navigation/core/navigation_observer.dart';
 import 'package:router_app/navigation/core/route_path.dart';
 
 import '../main.dart';
@@ -5,8 +6,9 @@ import 'core/tab_routes_config.dart';
 import 'platform_tabs_page.dart';
 
 final routeConfig = TabRoutesConfig(
-    tabRoutes,
-    (context, tabRoutes, view, controller) => PlatformTabsPage(
+    routes: tabRoutes, 
+    observer: LocationObserver(),  
+    builder: (context, tabRoutes, view, controller) => PlatformTabsPage(
         tabRoutes: tabRoutes, view: view, controller: controller));
 
 final tabRoutes = [

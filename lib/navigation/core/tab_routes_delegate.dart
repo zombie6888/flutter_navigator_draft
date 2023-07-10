@@ -7,15 +7,16 @@ import 'package:router_app/navigation/transitions/platform_page_factory.dart';
 
 import 'app_router.dart';
 import 'custom_route_delegate.dart';
+import 'navigation_observer.dart';
 import 'navigation_stack.dart';
 import 'tab_stack_builder.dart';
 
-// Builder for tabs. Provide way to 
+// Builder for tabs. Provide way to
 typedef TabPageBuilder = Widget Function(BuildContext context,
     Iterable<RoutePath> tabRoutes, TabBarView view, TabController controller);
 
 /// Router delagate for tabs navigation.
-/// 
+///
 /// This class handle [NavigationStack] updates
 /// from predefined route configuration [routes] and uses [tabPageBuider]
 /// for showing tab navigation pages. It contains root [Navigator]
@@ -26,38 +27,36 @@ typedef TabPageBuilder = Widget Function(BuildContext context,
 class TabRoutesDelegate extends RouterDelegate<NavigationStack>
     with ChangeNotifier, PopNavigatorRouterDelegateMixin
     implements CustomRouteDelegate {
-  TabRoutesDelegate(List<RoutePath> routes, this.tabPageBuider)
+  TabRoutesDelegate(List<RoutePath> routes, this.tabPageBuider, this.observer)
       : _routes = List.unmodifiable(routes),
         _rootNavigatorKey = GlobalKey<NavigatorState>();
 
+  /// Observes navigation events
+  @override
+  final NavigationObserver? observer;
 
   /// Widget builder for tabs page. Mostly scaffold with bootomTabBar.
   final TabPageBuilder tabPageBuider;
 
-  
   /// Uses for root navigator access
   final GlobalKey<NavigatorState> _rootNavigatorKey;
-
 
   /// [NavigationStack] keeps all data which is neccessary for [currentConfiguration].
   ///
   /// As opposite to [_routes], we can modify [_stack.routes] list.
   NavigationStack _stack = NavigationStack([]);
 
-
   /// Route configaration which could be passed to [TabRoutesConfig]
-  /// 
+  ///
   /// This is predefined routes and it shouldn't be changed.
-  /// Route parse utilities will pick routes from [_routes] list and update 
+  /// Route parse utilities will pick routes from [_routes] list and update
   /// [NavigationStack] accordingly. As opposite to [_stack.routes],
   /// this list is unmodifiable.
   final List<RoutePath> _routes;
 
-
   /// Whether page was opened from deep link
   bool _fromDeepLink = true;
 
-  
   /// Index of previous opened tab
   int _previousIndex = 0;
 
@@ -89,13 +88,13 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
   @override
   GlobalKey<NavigatorState>? get navigatorKey => GlobalKey();
 
-  /// Current navigation config. 
+  /// Current navigation config.
   @override
   NavigationStack? get currentConfiguration => _stack;
-  
+
   /// This will update navigation configration.
-  /// 
-  /// [_stack] could be updated either, by [pushNamed] function 
+  ///
+  /// [_stack] could be updated either, by [pushNamed] function
   /// or by platform. For example if you come from deep link.
   /// See [RouterDelegate.setNewRoutePath]
   @override
@@ -116,6 +115,7 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
     _fromDeepLink = false;
     final upadatedStack =
         RouteParseUtils(path).pushRouteToStack(_routes, _stack);
+    observer?.didPushRoute(upadatedStack.currentLocation);
     setNewRoutePath(upadatedStack);
   }
 
@@ -167,15 +167,14 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
   ///
   /// This will update [currentLocation] and [index] of active tab route.
   void _tabIndexUpdateHandler(int index) {
-    final parentRoute = _stack.routes[index];
-    final children = parentRoute.children;
-    _stack = _stack.copyWith(
-        currentIndex: index,
-        currentLocation: children.isNotEmpty
-            ? children.last.path != '/'
-                ? '${parentRoute.path}${children.last.path}'
-                : parentRoute.path
-            : parentRoute.path);
+    final location = _getCurrentLocation(_stack.routes[index]);
+    _stack = _stack.copyWith(currentIndex: index, currentLocation: location);
+    observer?.didPushRoute(location);
+    // children.isNotEmpty
+    //     ? children.last.path != '/'
+    //         ? '${parentRoute.path}${children.last.path}'
+    //         : parentRoute.path
+    //     : parentRoute.path);
     notifyListeners();
   }
 
@@ -195,7 +194,7 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
 
   /// Calling when get back from nested page.
   ///
-  /// It will remove a nested route in [_stack].
+  /// It will remove a nested route from [_stack].
   bool _onPopNestedPage(Route<dynamic> route, dynamic result) {
     if (!route.didPop(result)) {
       return false;
@@ -219,13 +218,18 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
       //notifyListeners();
       //return true;
     }
+
+    final location = _getCurrentLocation(_stack.routes[_stack.currentIndex]);
+    _stack.copyWith(currentLocation: location);
+    observer?.didPopRoute(location);
+
     notifyListeners();
     return true;
   }
 
   /// Calling when get back from root page.
   ///
-  /// It will remove a root route in navigation stack [_stack].
+  /// It will remove a root route from navigation stack [_stack].
   bool _onPopRootPage(
       Route<dynamic> route, dynamic result, Iterable<Page<dynamic>> pages) {
     if (!route.didPop(result)) {
@@ -236,9 +240,25 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
 
     if (pages.isNotEmpty && routes.length > 1) {
       _stack = _stack.copyWith(routes: [...routes]..removeLast());
+
+      final location = _getCurrentLocation(_stack.routes[_stack.currentIndex]);
+      _stack.copyWith(currentLocation: location);
+      observer?.didPopRoute(location);
+
       notifyListeners();
       return true;
     }
     return true;
+  }
+
+  /// Returns location of active root or nested route
+  String _getCurrentLocation(RoutePath route) {
+    final children = route.children;
+    if (children.isNotEmpty) {
+      return children.last.path != '/'
+          ? '${route.path}${children.last.path}'
+          : route.path;
+    }
+    return route.path;
   }
 }

@@ -56,7 +56,7 @@ class Page8 extends StatelessWidget {
               const Text(
                 "page8",
                 style: TextStyle(fontSize: 22),
-              ),             
+              ),
               TextButton(
                   onPressed: () {
                     //Navigator.of(context).pushNamed('/page1');
@@ -111,13 +111,13 @@ class Page1 extends StatelessWidget {
                     router.pushNamed('/tab3/page2');
                   },
                   child:
-                      const Text("to page2", style: TextStyle(fontSize: 22))), 
+                      const Text("to page2", style: TextStyle(fontSize: 22))),
               TextButton(
                   onPressed: () {
                     router.pushNamed('/tab2/page8');
                   },
                   child:
-                      const Text("to page8", style: TextStyle(fontSize: 22))),                              
+                      const Text("to page8", style: TextStyle(fontSize: 22))),
               TextButton(
                   onPressed: () {
                     //Navigator.of(context).pushNamed('/page1');
@@ -140,7 +140,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   void initState() {
-    print('home init state');
     super.initState();
   }
 
@@ -148,38 +147,44 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     print('build home');
     final router = AppRouter.of(context);
-    return Scaffold(
-        appBar: AppBar(title: const Text("home")),
-        body: Center(
-          child: Builder(builder: (context) {
-            return Column(
-              children: [
-                const Text("home", style: TextStyle(fontSize: 22)),
-                TextButton(
-                    onPressed: () {
-                      //Navigator.of(context).pushNamed('/page1');
-                      router.pushNamed('/tab2/page1');
-                    },
-                    child:
-                        const Text("to page1", style: TextStyle(fontSize: 22))),
-                TextButton(
-                    onPressed: () {
-                      //Navigator.of(context).pushNamed('/page1');
-                      router.pushNamed('/tab1/page4?test=1');
-                    },
-                    child:
-                        const Text("to page4", style: TextStyle(fontSize: 22))),
-                TextButton(
-                    onPressed: () {
-                      //Navigator.of(context).pushNamed('/page1');
-                      router.pushNamed('/tab1/page6?test=1');
-                    },
-                    child:
-                        const Text("to page6", style: TextStyle(fontSize: 22)))
-              ],
-            );
-          }),
-        ));
+    return StreamBuilder(
+        stream: router.locationUpdates,
+        builder: (context, snapshot) {
+          print('home page navigation event');
+          print('type: ${snapshot.data?.type}, current location: ${snapshot.data?.currentLocation}, previous location: ${snapshot.data?.previousLocation}');
+          return Scaffold(
+              appBar: AppBar(title: const Text("home")),
+              body: Center(
+                child: Builder(builder: (context) {
+                  return Column(
+                    children: [
+                      const Text("home", style: TextStyle(fontSize: 22)),
+                      TextButton(
+                          onPressed: () {
+                            //Navigator.of(context).pushNamed('/page1');
+                            router.pushNamed('/tab2/page1');
+                          },
+                          child: const Text("to page1",
+                              style: TextStyle(fontSize: 22))),
+                      TextButton(
+                          onPressed: () {
+                            //Navigator.of(context).pushNamed('/page1');
+                            router.pushNamed('/tab1/page4?test=1');
+                          },
+                          child: const Text("to page4",
+                              style: TextStyle(fontSize: 22))),
+                      TextButton(
+                          onPressed: () {
+                            //Navigator.of(context).pushNamed('/page1');
+                            router.pushNamed('/tab1/page6?test=1');
+                          },
+                          child: const Text("to page6",
+                              style: TextStyle(fontSize: 22)))
+                    ],
+                  );
+                }),
+              ));
+        });
   }
 }
 
