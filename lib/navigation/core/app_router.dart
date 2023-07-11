@@ -28,6 +28,12 @@ class AppRouter extends InheritedWidget {
     routerDelegate.pushNamed(path);
   }
 
+  redirect(String path) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      routerDelegate.pushNamed(path, true);
+    });
+  }
+
   pop() {
     final navigator = navigatorKey?.currentState;
     assert(navigator != null, 'No navigator found');
@@ -35,12 +41,18 @@ class AppRouter extends InheritedWidget {
   }
 
   static AppRouter? maybeOf(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<AppRouter>();
+    return context.getInheritedWidgetOfExactType<AppRouter>();
   }
+
+  // static AppRouter read(BuildContext context) {
+  //   final AppRouter? result = maybeOf(context);
+  //   assert(result != null, 'No router found in context');
+  //   return result!;
+  // }
 
   static AppRouter of(BuildContext context) {
     final AppRouter? result = maybeOf(context);
-    assert(result != null, 'No FrogColor found in context');
+    assert(result != null, 'No router found in context');
     return result!;
   }
 

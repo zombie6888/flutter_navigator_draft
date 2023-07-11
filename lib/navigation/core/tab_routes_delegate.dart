@@ -57,6 +57,9 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
   /// Whether page was opened from deep link
   bool _fromDeepLink = true;
 
+  /// Whether page was redirected from another page
+  bool _pageWasRedirected = true;
+
   /// Index of previous opened tab
   int _previousIndex = 0;
 
@@ -66,7 +69,7 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
     final nestedPages = rootRoute.children
         .map(
           (route) => PlatformPageFactory.getPage(
-              child: _createPage(context, route, rootRoute.navigatorKey)),
+              child: _createPage(route, rootRoute.navigatorKey)),
         )
         .toList();
 
@@ -99,7 +102,9 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
   /// See [RouterDelegate.setNewRoutePath]
   @override
   Future<void> setNewRoutePath(NavigationStack configuration) async {
-    _previousIndex = _stack.currentIndex;
+    _previousIndex = _fromDeepLink || _pageWasRedirected
+        ? configuration.currentIndex
+        : _stack.currentIndex;
     _stack = configuration;
     notifyListeners();
   }
@@ -111,12 +116,35 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
   /// AppRouter.of(context).pushNamed('page');
   /// ```
   @override
-  pushNamed(String path) {
+  pushNamed(String path, [bool isRedirect = false]) {
     _fromDeepLink = false;
-    final upadatedStack =
+    _pageWasRedirected = isRedirect;
+    NavigationStack newStack =
         RouteParseUtils(path).pushRouteToStack(_routes, _stack);
-    observer?.didPushRoute(upadatedStack.currentLocation);
-    setNewRoutePath(upadatedStack);
+    observer?.didPushRoute(newStack.currentLocation);
+
+    if (isRedirect) {
+      final lastRoute = _stack.routes.last;
+      // root page
+      if (lastRoute.children.isEmpty) {
+        newStack = newStack.copyWith(
+            routes: newStack.routes
+                .where((e) => e.path != _stack.currentLocation)
+                .toList());
+        // if (lastRoute.path != path) {
+        //   [...upadatedStack.routes..removeLast(), lastRoute];
+        // }
+        // upadatedStack.copyWith(routes: [...upadatedStack.routes..removeLast()]);
+      } else {
+        // nsested page
+        final route = newStack.routes[_previousIndex];
+        final children = [...route.children];
+        newStack.routes[_previousIndex] =
+            route.copyWith(children: children..removeLast());
+      }
+    }
+
+    setNewRoutePath(newStack);
   }
 
   @override
@@ -127,8 +155,7 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
     }
 
     final pages = routes.where((e) => e.children.isEmpty).map(
-          (route) =>
-              PlatformPageFactory.getPage(child: _createPage(context, route)),
+          (route) => PlatformPageFactory.getPage(child: _createPage(route)),
         );
 
     final tabRoutes = routes.where((e) => e.children.isNotEmpty);
@@ -168,13 +195,10 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
   /// This will update [currentLocation] and [index] of active tab route.
   void _tabIndexUpdateHandler(int index) {
     final location = _getCurrentLocation(_stack.routes[index]);
+    if (location != _stack.currentLocation) {
+      observer?.didPushRoute(location);
+    }
     _stack = _stack.copyWith(currentIndex: index, currentLocation: location);
-    observer?.didPushRoute(location);
-    // children.isNotEmpty
-    //     ? children.last.path != '/'
-    //         ? '${parentRoute.path}${children.last.path}'
-    //         : parentRoute.path
-    //     : parentRoute.path);
     notifyListeners();
   }
 
@@ -183,13 +207,15 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
   /// [AppRouter.navigatorKey] field is using for nested Navigator access.
   /// [AppRouter.routerDelegate] field is using for [TabRoutesDelegate] access.
   /// [AppRouter.routePath] contains current route path.
-  AppRouter _createPage(BuildContext context, RoutePath route,
+  AppRouter _createPage(RoutePath route,
       [GlobalKey<NavigatorState>? navigatorKey]) {
     return AppRouter(
         navigatorKey: navigatorKey ?? _rootNavigatorKey,
         routePath: route,
         routerDelegate: this,
-        child: route.widget ?? route.builder?.call(context) ?? Container());
+        child: Builder(builder: (context) {
+          return route.widget ?? route.builder?.call(context) ?? Container();
+        }));
   }
 
   /// Calling when get back from nested page.
@@ -213,7 +239,9 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
     // it will change active tab index to go back to previous tab
     //
     // TODO: make it optional?
-    if (!_fromDeepLink && _previousIndex != currentindex) {
+    if (!_fromDeepLink &&
+        !_pageWasRedirected &&
+        _previousIndex != currentindex) {
       _stack = _stack.copyWith(currentIndex: _previousIndex);
       //notifyListeners();
       //return true;

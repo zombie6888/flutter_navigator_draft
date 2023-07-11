@@ -27,7 +27,15 @@ class RoutePath {
   RoutePath.nested(this.path, this.children,
       {this.queryParams, this.params, this.builder})
       : widget = null,
-        navigatorKey = GlobalKey<NavigatorState>();    
+        navigatorKey = GlobalKey<NavigatorState>();  
+
+  RoutePath.builder(this.path, this.builder,
+      {this.queryParams,
+      this.params,   
+      List<RoutePath> children = const [],
+      this.navigatorKey})
+      : children = List.unmodifiable(children),
+        widget = null;                 
 
   /// Query params from [Uri.queryParameters]
   final Map<String, String>? queryParams;

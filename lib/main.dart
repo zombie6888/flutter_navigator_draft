@@ -24,10 +24,24 @@ class Page6 extends StatelessWidget {
               TextButton(
                   onPressed: () {
                     //Navigator.of(context).pushNamed('/page1');
+                    router.pushNamed('/tab2/page5');
+                  },
+                  child: const Text("/tab2/page5",
+                      style: TextStyle(fontSize: 22))),
+              TextButton(
+                  onPressed: () {
+                    //Navigator.of(context).pushNamed('/page1');
                     router.pushNamed('/tab1/page6?test=2&tre=3');
                   },
                   child: const Text("/tab1/page6?test=2",
                       style: TextStyle(fontSize: 22))),
+              TextButton(
+                  onPressed: () {
+                    //Navigator.of(context).pushNamed('/page1');
+                    router.pushNamed('/tab1/page7');
+                  },
+                  child: const Text("to page7 redirect",
+                      style: TextStyle(fontSize: 22))),        
               TextButton(
                   onPressed: () {
                     //Navigator.of(context).pushNamed('/page1');
@@ -262,7 +276,7 @@ class Page5 extends StatelessWidget {
   Widget build(BuildContext context) {
     print('build tab1/page5');
     return Scaffold(
-        appBar: AppBar(title: const Text("tab1/page5")),
+        appBar: AppBar(title: const Text("page5")),
         body: const Center(
           child: Column(
             children: [

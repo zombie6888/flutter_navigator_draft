@@ -109,7 +109,7 @@ class RouteParseUtils {
         final updatedNestedStack =
             _updateStack(routeList: routeList, stack: targetRoute.children);
 
-        final targetStack = [...routes];
+        final targetStack = [...routes.where((r) => r.children.isNotEmpty)];
         targetStack[index] =
             targetStack[index].copyWith(children: updatedNestedStack);
         return NavigationStack(targetStack,
@@ -198,8 +198,7 @@ class RouteParseUtils {
         return [...stack, targetRoute];
       }
       return _cropStack(
-        stack: stack,
-        currentRoute: currentRoute,
+        stack: stack,       
         targetRoute: targetRoute,
       );
     } else {
@@ -218,8 +217,7 @@ class RouteParseUtils {
 
   /// Returns stack, where route is last
   List<RoutePath> _cropStack({
-    required List<RoutePath> stack,
-    required RoutePath currentRoute,
+    required List<RoutePath> stack,    
     required RoutePath targetRoute,
   }) {
     final index = stack.indexOf(targetRoute);
