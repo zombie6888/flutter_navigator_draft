@@ -44,12 +44,6 @@ class AppRouter extends InheritedWidget {
     return context.getInheritedWidgetOfExactType<AppRouter>();
   }
 
-  // static AppRouter read(BuildContext context) {
-  //   final AppRouter? result = maybeOf(context);
-  //   assert(result != null, 'No router found in context');
-  //   return result!;
-  // }
-
   static AppRouter of(BuildContext context) {
     final AppRouter? result = maybeOf(context);
     assert(result != null, 'No router found in context');

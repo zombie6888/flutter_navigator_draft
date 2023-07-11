@@ -114,34 +114,26 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
   /// It will be called when you run
   /// ```dart
   /// AppRouter.of(context).pushNamed('page');
-  /// ```
+  /// or
+  /// AppRouter.of(context).redirect('page');
   @override
   pushNamed(String path, [bool isRedirect = false]) {
     _fromDeepLink = false;
     _pageWasRedirected = isRedirect;
-    NavigationStack newStack =
-        RouteParseUtils(path).pushRouteToStack(_routes, _stack);
+    final fullPath =
+        path.startsWith('/') ? path : '${_getRootLocation() ?? ''}/$path';
+    final utils = RouteParseUtils(fullPath);
+
+    final newStack = utils.pushRouteToStack(_routes, _stack);
     observer?.didPushRoute(newStack.currentLocation);
 
     if (isRedirect) {
-      final lastRoute = _stack.routes.last;
-      // root page
-      if (lastRoute.children.isEmpty) {
-        newStack = newStack.copyWith(
-            routes: newStack.routes
-                .where((e) => e.path != _stack.currentLocation)
-                .toList());
-        // if (lastRoute.path != path) {
-        //   [...upadatedStack.routes..removeLast(), lastRoute];
-        // }
-        // upadatedStack.copyWith(routes: [...upadatedStack.routes..removeLast()]);
-      } else {
-        // nsested page
-        final route = newStack.routes[_previousIndex];
-        final children = [...route.children];
-        newStack.routes[_previousIndex] =
-            route.copyWith(children: children..removeLast());
-      }
+      final redirectStack = utils.getRedirectStack(
+          previousIndex: _previousIndex,
+          currentStack: _stack,
+          targetStack: newStack);
+      setNewRoutePath(redirectStack);
+      return;
     }
 
     setNewRoutePath(newStack);
@@ -289,4 +281,7 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
     }
     return route.path;
   }
+
+  String? _getRootLocation() =>
+      RouteParseUtils(_stack.currentLocation).rootPath;
 }

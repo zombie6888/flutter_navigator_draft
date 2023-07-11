@@ -40,7 +40,7 @@ class RouteParseUtils {
         var route = branchRoutes[i];
         final children = _createChildStack(route.children);
         if (route.path.startsWith(rootPath ?? '')) {
-          final nestedPath = _getNestedPath(_uri.path);
+          final nestedPath = getNestedPath(_uri.path);
           final childRoute =
               route.children.firstWhereOrNull((c) => c.path == nestedPath);
           if (childRoute != null) {
@@ -189,7 +189,7 @@ class RouteParseUtils {
     bool isRootStack = false,
   }) {
     final fullPath = _uri.path;
-    final path = isRootStack ? fullPath : _getNestedPath(fullPath);
+    final path = isRootStack ? fullPath : getNestedPath(fullPath);
     final currentRoute = stack.lastWhereOrNull((c) => c.path == path);
     if (currentRoute != null) {
       final targetRoute =
@@ -198,7 +198,7 @@ class RouteParseUtils {
         return [...stack, targetRoute];
       }
       return _cropStack(
-        stack: stack,       
+        stack: stack,
         targetRoute: targetRoute,
       );
     } else {
@@ -210,14 +210,14 @@ class RouteParseUtils {
   }
 
   /// Returns nested path for subroutes
-  String _getNestedPath(String path) {
+  String getNestedPath(String path) {
     final nestedSegments = path.split('/').sublist(2);
     return nestedSegments.isNotEmpty ? '/${nestedSegments.join('/')}' : '';
   }
 
   /// Returns stack, where route is last
   List<RoutePath> _cropStack({
-    required List<RoutePath> stack,    
+    required List<RoutePath> stack,
     required RoutePath targetRoute,
   }) {
     final index = stack.indexOf(targetRoute);
@@ -225,5 +225,39 @@ class RouteParseUtils {
     subRoutes[index] =
         subRoutes[index].copyWith(queryParams: _uri.queryParameters);
     return subRoutes;
+  }
+
+  
+  /// When pushed redirect route, we need to remove it from [targetStack] 
+  NavigationStack getRedirectStack({
+    required int previousIndex,
+    required NavigationStack currentStack,
+    required NavigationStack targetStack,
+  }) {
+    final lastRoute = currentStack.routes.last;
+    // redirect to root page
+    if (lastRoute.children.isEmpty) {
+      targetStack = targetStack.copyWith(
+          routes: targetStack.routes
+              .where((e) => e.path != currentStack.currentLocation)
+              .toList());
+    } else {
+       // redirect to nested page of another parent route
+      if (targetStack.currentIndex != previousIndex) {       
+        final route = targetStack.routes[previousIndex];
+        final children = [...route.children];
+        targetStack.routes[previousIndex] =
+            route.copyWith(children: children..removeLast());
+      } else {
+        // redirect to nested page of the same parent route
+        final nestedPath = getNestedPath(currentStack.currentLocation);
+        final parentRoute = targetStack.routes[targetStack.currentIndex];
+        targetStack.routes[targetStack.currentIndex] = parentRoute.copyWith(
+            children: parentRoute.children
+                .where((e) => e.path != nestedPath)
+                .toList());
+      }
+    }
+    return targetStack;
   }
 }

@@ -128,6 +128,12 @@ class Page1 extends StatelessWidget {
                       const Text("to page2", style: TextStyle(fontSize: 22))),
               TextButton(
                   onPressed: () {
+                    router.pushNamed('/tab2/page5');
+                  },
+                  child:
+                      const Text("to tab2 page5", style: TextStyle(fontSize: 22))),        
+              TextButton(
+                  onPressed: () {
                     router.pushNamed('/tab2/page8');
                   },
                   child:
@@ -274,16 +280,49 @@ class Page5 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('build tab1/page5');
+    final router = AppRouter.of(context);  
     return Scaffold(
         appBar: AppBar(title: const Text("page5")),
-        body: const Center(
+        body:  Center(
           child: Column(
             children: [
-              Text(
+              const Text(
                 "page5",
                 style: TextStyle(fontSize: 22),
               ),
+              TextButton(
+                  onPressed: () {
+                    router.pushNamed('page9');
+                  },
+                  child:
+                      const Text("to tab2 page9", style: TextStyle(fontSize: 22))),
+            ],
+          ),
+        ));
+  }
+}
+
+class Page9 extends StatelessWidget {
+  const Page9({super.key});
+
+  @override
+  Widget build(BuildContext context) { 
+     final router = AppRouter.of(context);  
+    return Scaffold(
+        appBar: AppBar(title: const Text("page9")),
+        body:  Center(
+          child: Column(
+            children: [
+              const Text(
+                "page9",
+                style: TextStyle(fontSize: 22),
+              ),
+               TextButton(
+                  onPressed: () {
+                    router.pushNamed('/tab2/page5');
+                  },
+                  child:
+                      const Text("to tab2 page5", style: TextStyle(fontSize: 22))),
             ],
           ),
         ));
