@@ -13,8 +13,8 @@ class RouteParseUtils {
     _uri = Uri.tryParse(path!) ?? Uri();
   }
 
-  String? get rootPath =>
-      _uri.pathSegments.isNotEmpty ? '/${_uri.pathSegments[0]}' : null;
+  String? get parentPath =>
+      _uri.pathSegments.length > 1 ? '/${_uri.pathSegments[0]}' : null;
 
   /// Returns updated configaration [NavigationStack]
   ///
@@ -35,11 +35,11 @@ class RouteParseUtils {
         ?.copyWith(queryParams: _uri.queryParameters);
 
     // stack from nested uri
-    if (rootPath != null && _uri.pathSegments.length > 1) {
+    if (parentPath != null) {
       for (var i = 0; i < branchRoutes.length; i++) {
         var route = branchRoutes[i];
         final children = _createChildStack(route.children);
-        if (route.path.startsWith(rootPath ?? '')) {
+        if (route.path.startsWith(parentPath ?? '')) {
           final nestedPath = getNestedPath(_uri.path);
           final childRoute =
               route.children.firstWhereOrNull((c) => c.path == nestedPath);
@@ -102,8 +102,8 @@ class RouteParseUtils {
     }
 
     // add route to nested stack
-    if (rootPath != null && _uri.pathSegments.length > 1) {
-      final targetRoute = routes.firstWhereOrNull((e) => e.path == rootPath);
+    if (parentPath != null) {
+      final targetRoute = routes.firstWhereOrNull((e) => e.path == parentPath);
       if (targetRoute != null) {
         final index = routes.indexOf(targetRoute);
         final updatedNestedStack =
@@ -149,7 +149,7 @@ class RouteParseUtils {
       routes.isNotEmpty ? [routes.first] : [];
 
   /// Search route in [routeList] configuration
-  RoutePath? _searchRoute(List<RoutePath> routeList, String path,
+  RoutePath? searchRoute(List<RoutePath> routeList, String path,
       [bool searchInRootRoutes = false]) {
     if (searchInRootRoutes) {
       return routeList.lastWhereOrNull((e) => e.path == path);
@@ -202,7 +202,7 @@ class RouteParseUtils {
         targetRoute: targetRoute,
       );
     } else {
-      final route = _searchRoute(routeList, path, isRootStack);
+      final route = searchRoute(routeList, path, isRootStack);
       return route != null
           ? [...stack, route.copyWith(queryParams: _uri.queryParameters)]
           : [...stack];

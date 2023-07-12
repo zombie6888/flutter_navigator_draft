@@ -31,6 +31,6 @@ final tabRoutes = [
     RoutePath('/page2', const Page2()),
     RoutePath('/nestedtest/page7', const Page7()),
   ]),
-  RoutePath('/tab1/page6', const Page6()),
-  RoutePath('/tab1/page7', const RedirectWidget(path: '/tab3/nestedtest/page7')),
+  RoutePath('/page6', const Page6()),
+  RoutePath('/page7', const RedirectWidget(path: '/tab3/nestedtest/page7')),
 ];

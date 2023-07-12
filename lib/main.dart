@@ -28,12 +28,19 @@ class Page6 extends StatelessWidget {
                   },
                   child: const Text("/tab2/page5",
                       style: TextStyle(fontSize: 22))),
+               TextButton(
+                  onPressed: () {
+                    //Navigator.of(context).pushNamed('/page1');
+                    router.pushNamed('page1');
+                  },
+                  child: const Text("to page1",
+                      style: TextStyle(fontSize: 22))),        
               TextButton(
                   onPressed: () {
                     //Navigator.of(context).pushNamed('/page1');
-                    router.pushNamed('/tab1/page6?test=2&tre=3');
+                    router.pushNamed('page6?test=2&tre=3');
                   },
-                  child: const Text("/tab1/page6?test=2",
+                  child: const Text("page6?test=2",
                       style: TextStyle(fontSize: 22))),
               TextButton(
                   onPressed: () {
@@ -196,7 +203,7 @@ class _HomePageState extends State<HomePage> {
                       TextButton(
                           onPressed: () {
                             //Navigator.of(context).pushNamed('/page1');
-                            router.pushNamed('/tab1/page6?test=1');
+                            router.pushNamed('/page6?test=1');
                           },
                           child: const Text("to page6",
                               style: TextStyle(fontSize: 22)))

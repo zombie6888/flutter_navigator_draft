@@ -282,6 +282,14 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
     return route.path;
   }
 
-  String? _getRootLocation() =>
-      RouteParseUtils(_stack.currentLocation).rootPath;
+  String? _getRootLocation() {
+    final utils = RouteParseUtils(_stack.currentLocation);
+    final route = utils.searchRoute(_routes, _stack.currentLocation, true);
+    if ((route?.children ?? []).isNotEmpty) {
+      return _stack.currentLocation;
+    } else {
+      return utils.parentPath;
+    }
+  }
+  //RouteParseUtils(_stack.currentLocation).parentPath;
 }
