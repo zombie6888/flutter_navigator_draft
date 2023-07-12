@@ -121,7 +121,7 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
     _fromDeepLink = false;
     _pageWasRedirected = isRedirect;
     final fullPath =
-        path.startsWith('/') ? path : '${_getRootLocation() ?? ''}/$path';
+        path.startsWith('/') ? path : '${_getParentLocation() ?? ''}/$path';
     final utils = RouteParseUtils(fullPath);
 
     final newStack = utils.pushRouteToStack(_routes, _stack);
@@ -186,7 +186,7 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
   ///
   /// This will update [currentLocation] and [index] of active tab route.
   void _tabIndexUpdateHandler(int index) {
-    final location = _getCurrentLocation(_stack.routes[index]);
+    final location = _getRouteLocation(_stack.routes[index]);
     if (location != _stack.currentLocation) {
       observer?.didPushRoute(location);
     }
@@ -239,7 +239,7 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
       //return true;
     }
 
-    final location = _getCurrentLocation(_stack.routes[_stack.currentIndex]);
+    final location = _getRouteLocation(_stack.routes[_stack.currentIndex]);
     _stack.copyWith(currentLocation: location);
     observer?.didPopRoute(location);
 
@@ -261,7 +261,7 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
     if (pages.isNotEmpty && routes.length > 1) {
       _stack = _stack.copyWith(routes: [...routes]..removeLast());
 
-      final location = _getCurrentLocation(_stack.routes[_stack.currentIndex]);
+      final location = _getRouteLocation(_stack.routes[_stack.currentIndex]);
       _stack.copyWith(currentLocation: location);
       observer?.didPopRoute(location);
 
@@ -272,7 +272,7 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
   }
 
   /// Returns location of active root or nested route
-  String _getCurrentLocation(RoutePath route) {
+  String _getRouteLocation(RoutePath route) {
     final children = route.children;
     if (children.isNotEmpty) {
       return children.last.path != '/'
@@ -282,14 +282,26 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
     return route.path;
   }
 
-  String? _getRootLocation() {
-    final utils = RouteParseUtils(_stack.currentLocation);
-    final route = utils.searchRoute(_routes, _stack.currentLocation, true);
+  /// Returns location of parent route
+  ///
+  /// if current location is: /tab1.
+  ///                             --/
+  ///                             --...
+  /// result will be: /tab1.
+  /// if current location is: /tab1
+  ///                            --/page1
+  ///                            ...
+  /// result will be the same: /tab1.
+  /// if current location is: /page1 (not a nested page opened)
+  /// result will be null; 
+  String? _getParentLocation() {
+    final location = _stack.currentLocation;
+    final utils = RouteParseUtils(location);
+    final route = utils.searchRoute(_routes, location, true);
     if ((route?.children ?? []).isNotEmpty) {
-      return _stack.currentLocation;
+      return location;
     } else {
       return utils.parentPath;
     }
-  }
-  //RouteParseUtils(_stack.currentLocation).parentPath;
+  }  
 }
