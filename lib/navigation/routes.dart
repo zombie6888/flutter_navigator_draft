@@ -24,7 +24,7 @@ final tabRoutes = [
     RoutePath('/page5', const Page5()),
     RoutePath('/page9', const Page9()),
     RoutePath.builder('/page8',
-        (context) => const RedirectWidget(path: '/tab2/page5'))
+        (context) => const RedirectWidget(path: '/tab1/page5'))
   ]),
   RoutePath('/page1', const Page8()),
   RoutePath.nested('/tab3', [

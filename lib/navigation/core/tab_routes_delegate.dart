@@ -129,7 +129,7 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
 
     if (isRedirect) {
       final redirectStack = utils.getRedirectStack(
-          previousIndex: _previousIndex,
+         
           currentStack: _stack,
           targetStack: newStack);
       setNewRoutePath(redirectStack);

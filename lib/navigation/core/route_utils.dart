@@ -230,7 +230,6 @@ class RouteParseUtils {
   
   /// When pushed redirect route, we need to remove it from [targetStack] 
   NavigationStack getRedirectStack({
-    required int previousIndex,
     required NavigationStack currentStack,
     required NavigationStack targetStack,
   }) {
@@ -243,10 +242,10 @@ class RouteParseUtils {
               .toList());
     } else {
        // redirect to nested page of another parent route
-      if (targetStack.currentIndex != previousIndex) {       
-        final route = targetStack.routes[previousIndex];
+      if (targetStack.currentIndex != currentStack.currentIndex) {       
+        final route = targetStack.routes[currentStack.currentIndex];
         final children = [...route.children];
-        targetStack.routes[previousIndex] =
+        targetStack.routes[currentStack.currentIndex] =
             route.copyWith(children: children..removeLast());
       } else {
         // redirect to nested page of the same parent route
