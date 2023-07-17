@@ -2,7 +2,7 @@ import 'package:router_app/navigation/core/navigation_observer.dart';
 import 'package:router_app/navigation/core/route_path.dart';
 import 'package:router_app/navigation/redirect_widget.dart';
 
-import '../main.dart';
+import '../pages.dart';
 import 'core/tab_routes_config.dart';
 import 'platform_tabs_page.dart';
 
