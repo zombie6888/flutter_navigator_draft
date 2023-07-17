@@ -20,11 +20,11 @@ class RoutePath {
       this.navigatorKey})
       : children = List.unmodifiable(children);
 
-  /// Constructor for nested routes. Can be used for tab navigation.
+  /// Constructor for branch route. Can be used for tab navigation.
   /// If route contains [children] property, it will be treated
   /// as a parent route for a child stack. 
   /// Otherwise it's just a single page route.
-  RoutePath.nested(this.path, this.children,
+  RoutePath.branch(this.path, this.children,
       {this.queryParams, this.params, this.builder})
       : widget = null,
         navigatorKey = GlobalKey<NavigatorState>();  

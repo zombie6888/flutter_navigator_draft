@@ -13,13 +13,13 @@ final routeConfig = TabRoutesConfig(
         tabRoutes: tabRoutes, view: view, controller: controller));
 
 final tabRoutes = [
-  RoutePath.nested('/tab1', [
+  RoutePath.branch('/tab1', [
     RoutePath('/', const HomePage()),
     RoutePath('/page4', const Page4()),
     RoutePath('/page5', const Page5()),
     RoutePath('/nestedtest/page7', const Page7()),
   ]),
-  RoutePath.nested('/tab2', [
+  RoutePath.branch('/tab2', [
     RoutePath('/page1', const Page1()),
     RoutePath('/page5', const Page5()),
     RoutePath('/page9', const Page9()),
@@ -27,7 +27,7 @@ final tabRoutes = [
         (context) => const RedirectWidget(path: '/tab1/page5'))
   ]),
   RoutePath('/page1', const Page8()),
-  RoutePath.nested('/tab3', [
+  RoutePath.branch('/tab3', [
     RoutePath('/page2', const Page2()),
     RoutePath('/nestedtest/page7', const Page7()),
   ]),

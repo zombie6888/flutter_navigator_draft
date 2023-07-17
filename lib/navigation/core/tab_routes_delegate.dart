@@ -120,18 +120,15 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
   pushNamed(String path, [bool isRedirect = false]) {
     _fromDeepLink = false;
     _pageWasRedirected = isRedirect;
-    final fullPath =
-        path.startsWith('/') ? path : '${_getParentLocation() ?? ''}/$path';
+    final fullPath = path.startsWith('/') ? path : _getAbsolutePath(path);
     final utils = RouteParseUtils(fullPath);
 
     final newStack = utils.pushRouteToStack(_routes, _stack);
     observer?.didPushRoute(newStack.currentLocation);
 
     if (isRedirect) {
-      final redirectStack = utils.getRedirectStack(
-         
-          currentStack: _stack,
-          targetStack: newStack);
+      final redirectStack =
+          utils.getRedirectStack(currentStack: _stack, targetStack: newStack);
       setNewRoutePath(redirectStack);
       return;
     }
@@ -293,7 +290,7 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
   ///                            ...
   /// result will be the same: /tab1.
   /// if current location is: /page1 (not a nested page opened)
-  /// result will be null; 
+  /// result will be null;
   String? _getParentLocation() {
     final location = _stack.currentLocation;
     final utils = RouteParseUtils(location);
@@ -303,5 +300,20 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
     } else {
       return utils.parentPath;
     }
-  }  
+  }
+
+  /// Convert route related path to absoulte path
+  String? _getAbsolutePath(String path) {
+    final parentPath = _getParentLocation();
+    final utils = RouteParseUtils(path);
+    if (parentPath != null) {
+      final branchRoutes = _routes.where((r) => r.children.isNotEmpty).toList();
+      final targetRoute = utils.searchRoute(
+          branchRoutes[_stack.currentIndex].children, '/$path', true);
+      if (targetRoute != null) {
+        return '$parentPath/$path';
+      }
+    }
+    return '/$path';
+  }
 }
