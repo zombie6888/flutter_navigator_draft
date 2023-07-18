@@ -5,34 +5,38 @@ import 'package:router_app/navigation/core/route_utils.dart';
 import 'navigation_stack.dart';
 
 /// Custom route infromation parser.
-/// 
-/// This class is using to convert [RouteInformation] to [NavigationStack], and 
+///
+/// This class is using to convert [RouteInformation] to [NavigationStack], and
 /// get back [NavigationStack] from [RouteInformation].
-/// 
+///
 /// - See [RouteInformationParser]
-/// 
+///
 class CustomRouteInformationParser
     extends RouteInformationParser<NavigationStack> {
   final List<RoutePath> _routes;
-  CustomRouteInformationParser(NavigationStack stack) : _routes = stack.routes;
+  final RouteNotFoundPath _routeNotFoundPath;
+  CustomRouteInformationParser(
+      NavigationStack stack, RouteNotFoundPath routeNotFoundPath)
+      : _routes = stack.routes,
+        _routeNotFoundPath = routeNotFoundPath;
 
   /// Inform router about platfrom updates.
-  /// 
-  /// Takes [RouteInformation] from platform and returns 
+  ///
+  /// Takes [RouteInformation] from platform and returns
   /// updated [NavigationStack].
-  /// 
+  ///
   @override
   Future<NavigationStack> parseRouteInformation(
       RouteInformation routeInformation) async {
-    return RouteParseUtils(routeInformation.location)
+    return RouteParseUtils(routeInformation.location, _routeNotFoundPath)
         .restoreRouteStack(_routes);
   }
 
-  /// Inform platform about route configuration updates. 
-  /// 
-  /// Takes [NavigationStack] from router and pass updated [RouteInformation] 
+  /// Inform platform about route configuration updates.
+  ///
+  /// Takes [NavigationStack] from router and pass updated [RouteInformation]
   /// to platform.
-  /// 
+  ///
   @override
   RouteInformation? restoreRouteInformation(NavigationStack configuration) {
     final RoutePath? activeRoute =
@@ -49,9 +53,9 @@ class CustomRouteInformationParser
     final nestedPath = nestedRoute?.path ?? '';
     final query = nestedRoute?.queryString ?? '';
     if (nestedPath == '/') {
-      return RouteInformation(location:'$path$query');
+      return RouteInformation(location: '$path$query');
     } else {
-      return RouteInformation(location:'$path$nestedPath$query');
-    }    
+      return RouteInformation(location: '$path$nestedPath$query');
+    }
   }
 }

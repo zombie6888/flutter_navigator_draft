@@ -226,11 +226,41 @@ class _HomePageState extends State<HomePage> {
                           },
                           child: const Text("/tab2/page5",
                               style: TextStyle(fontSize: 22))),
+                      TextButton(
+                          key: const ValueKey('btn_route_not_found'),
+                          onPressed: () {
+                            router.pushNamed('/abrakadabra');
+                          },
+                          child: const Text("Push to non existing route",
+                              style: TextStyle(fontSize: 22))),        
                     ],
                   );
                 }),
               ));
         });
+  }
+}
+
+class RouteNotFoundPage extends StatelessWidget {
+  const RouteNotFoundPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    print('build route not found page');
+    return Scaffold(
+        appBar: AppBar(
+          leading: const BackButton(key: ValueKey('back_btn')),
+          title: const Text("404")),
+        body: const Center(
+          child: Column(
+            children: [
+              Text(
+                "404",
+                style: TextStyle(fontSize: 22),
+              ),
+            ],
+          ),
+        ));
   }
 }
 

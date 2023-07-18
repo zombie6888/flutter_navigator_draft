@@ -8,6 +8,8 @@ import 'platform_tabs_page.dart';
 
 final routeConfig = TabRoutesConfig(
     routes: tabRoutes,
+    routeNotFoundPath:
+        RouteNotFoundPath(path: '/not_found', child: const RouteNotFoundPage()),
     observer: LocationObserver(),
     builder: (context, tabRoutes, view, controller) => PlatformTabsPage(
         tabRoutes: tabRoutes, view: view, controller: controller));
@@ -23,8 +25,8 @@ final tabRoutes = [
     RoutePath('/page1', const Page1()),
     RoutePath('/page5', const Page5()),
     RoutePath('/page9', const Page9()),
-    RoutePath.builder('/page8',
-        (context) => const RedirectWidget(path: '/tab1/page5'))
+    RoutePath.builder(
+        '/page8', (context) => const RedirectWidget(path: '/tab1/page5'))
   ]),
   RoutePath('/page1', const Page8()),
   RoutePath.branch('/tab3', [

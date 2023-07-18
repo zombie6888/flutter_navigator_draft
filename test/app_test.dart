@@ -31,22 +31,26 @@ void main() {
     });
     testWidgets('HomeScreen loaded', (WidgetTester tester) async {
       await loadApp(tester);
+      await tester.pumpAndSettle();
       expect(find.text('home'), findsWidgets);
     });
     testWidgets('Push a single page', (WidgetTester tester) async {
       await loadApp(tester);
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('btn_page6')));
       await tester.pumpAndSettle();
       expect(find.text('page6'), findsWidgets);
     });
     testWidgets('Push a tab page', (WidgetTester tester) async {
       await loadApp(tester);
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('btn_tab2_page1')));
       await tester.pump();
       expect(find.text('page1'), findsWidgets);
     });
     testWidgets('Push a tab nested page', (WidgetTester tester) async {
       await loadApp(tester);
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('btn_tab2_page5')));
       await tester.pump();
       expect(find.text('page5'), findsWidgets);
@@ -54,6 +58,7 @@ void main() {
     testWidgets('Push a tab page, then nested page',
         (WidgetTester tester) async {
       await loadApp(tester);
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('btn_tab2_page1')));
       await tester.pump();
       expect(find.text('page1'), findsWidgets);
@@ -63,6 +68,7 @@ void main() {
     });
     testWidgets('Navigate between tabs', (WidgetTester tester) async {
       await loadApp(tester);
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('btn_tab2_page1')));
       await tester.pump();
       expect(find.text('page1'), findsWidgets);
@@ -72,6 +78,7 @@ void main() {
     });
     testWidgets('Push redirect page', (WidgetTester tester) async {
       await loadApp(tester);
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('btn_tab2_page1')));
       await tester.pump();
       expect(find.text('page1'), findsWidgets);
@@ -99,6 +106,7 @@ void main() {
     });
     testWidgets('Pop test', (WidgetTester tester) async {
       await loadApp(tester);
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('btn_page6')));
       await tester.pumpAndSettle();
       expect(find.text('page6'), findsWidgets);
@@ -107,7 +115,8 @@ void main() {
       expect(find.text('home'), findsWidgets);
     });
     testWidgets('Pop from nested page test', (WidgetTester tester) async {
-       await loadApp(tester);
+      await loadApp(tester);
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('btn_tab1_page5')));
       await tester.pumpAndSettle();
       expect(find.text('page5'), findsWidgets);
@@ -117,6 +126,7 @@ void main() {
     });
     testWidgets('Navigate between tabs and back', (WidgetTester tester) async {
       await loadApp(tester);
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('btn_tab2_page1')));
       await tester.pump();
       expect(find.text('page1'), findsWidgets);
@@ -129,6 +139,7 @@ void main() {
     });
     testWidgets('Navigate to redirect and back', (WidgetTester tester) async {
       await loadApp(tester);
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('btn_tab2_page1')));
       await tester.pump();
       expect(find.text('page1'), findsWidgets);
@@ -141,6 +152,7 @@ void main() {
     });
     testWidgets('Pop from from deep link', (WidgetTester tester) async {
       await loadApp(tester);
+      await tester.pumpAndSettle();
       final stack = await parser.parseRouteInformation(
           const RouteInformation(location: '/tab2/page9'));
       await delegate.setNewRoutePath(stack);

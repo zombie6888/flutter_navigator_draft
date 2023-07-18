@@ -8,15 +8,26 @@ import 'route_path.dart';
 import 'tab_routes_delegate.dart';
 
 /// Two-level navigation config for tabs.
-/// 
+///
+/// Accepts pre-defined stack of [routes]
+///
+/// The[routeNotFoundPath] route will be displayed,
+/// when routepath not found.
+///
+/// The [builder] is using for building tab page.
+/// The [observer] is using to observe route updates.
+///
 class TabRoutesConfig extends RouterConfig<NavigationStack> {
   TabRoutesConfig(
       {required List<RoutePath> routes,
-      required TabPageBuilder builder,      
+      RouteNotFoundPath? routeNotFoundPath,
+      required TabPageBuilder builder,
       NavigationObserver? observer})
       : super(
-            routeInformationParser:
-                CustomRouteInformationParser(NavigationStack(routes)),
-            routerDelegate: TabRoutesDelegate(routes, builder, observer),
+            routeInformationParser: CustomRouteInformationParser(
+                NavigationStack(routes),
+                routeNotFoundPath ?? RouteNotFoundPath()),
+            routerDelegate: TabRoutesDelegate(routes, builder, observer,
+                routeNotFoundPath ?? RouteNotFoundPath()),
             routeInformationProvider: CustomRouteInformationProvider());
 }

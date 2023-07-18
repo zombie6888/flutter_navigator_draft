@@ -9,10 +9,10 @@ import 'package:flutter/widgets.dart';
 ///   --page2
 /// ...
 /// Uri [path] can be like this: /tab1/path/page1, /tab1/../../page2
-/// 
-/// In order to get [RoutePath] from any widget, 
+///
+/// In order to get [RoutePath] from any widget,
 /// use: AppRouter.of(context).routePath.
-/// 
+///
 class RoutePath {
   RoutePath(this.path, this.widget,
       {this.queryParams,
@@ -23,23 +23,23 @@ class RoutePath {
       : children = List.unmodifiable(children);
 
   /// Constructor for branch route. Can be used for tab navigation.
-  /// 
+  ///
   /// If route contains [children] property, it will be treated
-  /// as a parent route for a child stack. 
+  /// as a parent route for a child stack.
   /// Otherwise it's just a single page route.
-  /// 
+  ///
   RoutePath.branch(this.path, this.children,
       {this.queryParams, this.params, this.builder})
       : widget = null,
-        navigatorKey = GlobalKey<NavigatorState>();  
+        navigatorKey = GlobalKey<NavigatorState>();
 
   RoutePath.builder(this.path, this.builder,
       {this.queryParams,
-      this.params,   
+      this.params,
       List<RoutePath> children = const [],
       this.navigatorKey})
       : children = List.unmodifiable(children),
-        widget = null;                 
+        widget = null;
 
   /// Query params from [Uri.queryParameters]
   final Map<String, String>? queryParams;
@@ -76,10 +76,15 @@ class RoutePath {
           queryParams: queryParams ?? this.queryParams,
           children: children ?? this.children,
           params: params,
-          builder: builder);  
+          builder: builder);
 
   @override
   int get hashCode => '$path$queryString'.hashCode;
 }
 
-final routeNotFoundPath = RoutePath('/', const Text("route not found"));
+class RouteNotFoundPath extends RoutePath {
+  RouteNotFoundPath({Widget? child, String path = '/', WidgetBuilder? builder})
+      : super(path,
+            builder == null ? child ?? const Text("route not found") : null,
+            builder: builder);
+}

@@ -6,12 +6,18 @@ import 'package:router_app/navigation/core/route_path.dart';
 import 'navigation_stack.dart';
 
 /// Utility class, which is using to parse route path to navigation stack
-/// 
+///
 class RouteParseUtils {
+  /// Target uri
+  ///
   late Uri _uri;
-  RouteParseUtils(String? path) {
+  /// Default route, when target route not found
+  /// 
+  late RouteNotFoundPath _routeNotFoundPath;
+  RouteParseUtils(String? path, [RouteNotFoundPath? routeNotFoundPath]) {
     assert(path != null, 'not a valid path!');
     _uri = Uri.tryParse(path!) ?? Uri();
+    _routeNotFoundPath = routeNotFoundPath ?? RouteNotFoundPath();
   }
 
   String? get parentPath =>
@@ -20,10 +26,10 @@ class RouteParseUtils {
   /// Returns updated configaration [NavigationStack]
   ///
   /// Takes [routes], passed by [RouteInformationParser]
-  /// and return updated navigation stack. 
-  /// 
+  /// and return updated navigation stack.
+  ///
   /// Called by platform, Deep links will be parsed here.
-  /// 
+  ///
   NavigationStack restoreRouteStack(List<RoutePath> routes) {
     assert(routes.isNotEmpty, 'route config should be not empty');
 
@@ -76,23 +82,26 @@ class RouteParseUtils {
       }
       branchStack[currentIndex] = currentBranch.copyWith(children: children);
 
-      final stack =
-          rootRoute == null ? branchStack : [...branchStack, rootRoute];
+      final stack = rootRoute == null
+          ? (_uri.path == '/'
+              ? branchStack
+              : [...branchStack, _routeNotFoundPath])
+          : [...branchStack, rootRoute];
+
       return NavigationStack(stack,
           currentIndex: currentIndex, currentLocation: _uri.path);
     }
 
-    /// TODO: route not found functionality
-    return NavigationStack([routeNotFoundPath]);
+    return NavigationStack([_routeNotFoundPath]);
   }
 
   /// Returns updated configaration [NavigationStack]
   ///
   /// Takes [routeList] and current [stack] from [RouterDelegate]
-  /// and return updated navigation stack. 
-  /// 
+  /// and return updated navigation stack.
+  ///
   /// Called by [CustomRouteDelegate.pushNamed].
-  /// 
+  ///
   NavigationStack pushRouteToStack(
       List<RoutePath> routeList, NavigationStack stack) {
     final rootRoute = routeList.firstWhereOrNull((e) => e.path == _uri.path);
@@ -123,7 +132,7 @@ class RouteParseUtils {
       }
     }
 
-    return NavigationStack([]);
+    return NavigationStack([...routes, _routeNotFoundPath]);
   }
 
   /// Returns routes with only first route in nested stack
@@ -151,12 +160,12 @@ class RouteParseUtils {
   }
 
   /// Return routes with only first route in stack
-  /// 
+  ///
   List<RoutePath> _createChildStack(List<RoutePath> routes) =>
       routes.isNotEmpty ? [routes.first] : [];
 
   /// Search route in [routeList] configuration
-  /// 
+  ///
   RoutePath? searchRoute(List<RoutePath> routeList, String path,
       [bool searchInRootRoutes = false]) {
     if (searchInRootRoutes) {
@@ -182,17 +191,17 @@ class RouteParseUtils {
   /// If route was found but query parameters are different,
   /// then adds route to stack as a new route.
   ///
-  /// If route wasn't found in [stack], it will try to search 
-  /// route in [routeList] and adds it to stack as a new route 
+  /// If route wasn't found in [stack], it will try to search
+  /// route in [routeList] and adds it to stack as a new route
   /// in case of success.
   ///
   /// For example for stack:
-  ///   [page1, page2?q=1, page3] 
-  /// if you push: "page2?q=2",   
+  ///   [page1, page2?q=1, page3]
+  /// if you push: "page2?q=2",
   /// updated stack will be: [page1, page2?q=1, page3, page2?q=2],
   /// or if you push: "page2?q=1",
   /// updated stack will be: [page1, page2?q=1]
-  /// 
+  ///
   List<RoutePath> _updateStack({
     required List<RoutePath> routeList,
     required List<RoutePath> stack,
@@ -220,14 +229,14 @@ class RouteParseUtils {
   }
 
   /// Returns nested path for subroutes
-  /// 
+  ///
   String getNestedPath(String path) {
     final nestedSegments = path.split('/').sublist(2);
     return nestedSegments.isNotEmpty ? '/${nestedSegments.join('/')}' : '';
   }
 
   /// Returns stack, where route is last
-  /// 
+  ///
   List<RoutePath> _cropStack({
     required List<RoutePath> stack,
     required RoutePath targetRoute,
@@ -239,9 +248,8 @@ class RouteParseUtils {
     return subRoutes;
   }
 
-  
   /// When pushed redirect route, we need to remove it from [targetStack]
-  ///  
+  ///
   NavigationStack getRedirectStack({
     required NavigationStack currentStack,
     required NavigationStack targetStack,
@@ -254,8 +262,8 @@ class RouteParseUtils {
               .where((e) => e.path != currentStack.currentLocation)
               .toList());
     } else {
-       // redirect to nested page of another parent route
-      if (targetStack.currentIndex != currentStack.currentIndex) {       
+      // redirect to nested page of another parent route
+      if (targetStack.currentIndex != currentStack.currentIndex) {
         final route = targetStack.routes[currentStack.currentIndex];
         final children = [...route.children];
         targetStack.routes[currentStack.currentIndex] =
