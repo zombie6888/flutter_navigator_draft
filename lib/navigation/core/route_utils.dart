@@ -6,6 +6,7 @@ import 'package:router_app/navigation/core/route_path.dart';
 import 'navigation_stack.dart';
 
 /// Utility class, which is using to parse route path to navigation stack
+/// 
 class RouteParseUtils {
   late Uri _uri;
   RouteParseUtils(String? path) {
@@ -19,8 +20,10 @@ class RouteParseUtils {
   /// Returns updated configaration [NavigationStack]
   ///
   /// Takes [routes], passed by [RouteInformationParser]
-  /// and return updated navigation stack. Called by platform,
-  /// Deep links will be parsed here.
+  /// and return updated navigation stack. 
+  /// 
+  /// Called by platform, Deep links will be parsed here.
+  /// 
   NavigationStack restoreRouteStack(List<RoutePath> routes) {
     assert(routes.isNotEmpty, 'route config should be not empty');
 
@@ -86,7 +89,10 @@ class RouteParseUtils {
   /// Returns updated configaration [NavigationStack]
   ///
   /// Takes [routeList] and current [stack] from [RouterDelegate]
-  /// and return updated navigation stack. Called by [CustomRouteDelegate.pushNamed].
+  /// and return updated navigation stack. 
+  /// 
+  /// Called by [CustomRouteDelegate.pushNamed].
+  /// 
   NavigationStack pushRouteToStack(
       List<RoutePath> routeList, NavigationStack stack) {
     final rootRoute = routeList.firstWhereOrNull((e) => e.path == _uri.path);
@@ -145,10 +151,12 @@ class RouteParseUtils {
   }
 
   /// Return routes with only first route in stack
+  /// 
   List<RoutePath> _createChildStack(List<RoutePath> routes) =>
       routes.isNotEmpty ? [routes.first] : [];
 
   /// Search route in [routeList] configuration
+  /// 
   RoutePath? searchRoute(List<RoutePath> routeList, String path,
       [bool searchInRootRoutes = false]) {
     if (searchInRootRoutes) {
@@ -167,22 +175,24 @@ class RouteParseUtils {
 
   /// Returns updated route list for nested routes depending on [_uri.path]
   /// and [_uri.queryParameters].
-
-  /// if route was found in [stack] and it has the same query parameters,
+  ///
+  /// If route was found in [stack] and it has the same query parameters,
   /// then crop stack (return stack, where route is last).
   ///
-  /// if route was found but query parameters are different,
+  /// If route was found but query parameters are different,
   /// then adds route to stack as a new route.
   ///
-  /// if route wasn't found in [stack], it will try to search route in [routeList]
-  /// and adds it to stack as a new route in case of success
+  /// If route wasn't found in [stack], it will try to search 
+  /// route in [routeList] and adds it to stack as a new route 
+  /// in case of success.
   ///
-  /// for example for stack:
-  ///   [page1, page2?q=1, page3]
-  /// if you push: "page2?q=2",
+  /// For example for stack:
+  ///   [page1, page2?q=1, page3] 
+  /// if you push: "page2?q=2",   
   /// updated stack will be: [page1, page2?q=1, page3, page2?q=2],
   /// or if you push: "page2?q=1",
   /// updated stack will be: [page1, page2?q=1]
+  /// 
   List<RoutePath> _updateStack({
     required List<RoutePath> routeList,
     required List<RoutePath> stack,
@@ -210,12 +220,14 @@ class RouteParseUtils {
   }
 
   /// Returns nested path for subroutes
+  /// 
   String getNestedPath(String path) {
     final nestedSegments = path.split('/').sublist(2);
     return nestedSegments.isNotEmpty ? '/${nestedSegments.join('/')}' : '';
   }
 
   /// Returns stack, where route is last
+  /// 
   List<RoutePath> _cropStack({
     required List<RoutePath> stack,
     required RoutePath targetRoute,
@@ -228,7 +240,8 @@ class RouteParseUtils {
   }
 
   
-  /// When pushed redirect route, we need to remove it from [targetStack] 
+  /// When pushed redirect route, we need to remove it from [targetStack]
+  ///  
   NavigationStack getRedirectStack({
     required NavigationStack currentStack,
     required NavigationStack targetStack,

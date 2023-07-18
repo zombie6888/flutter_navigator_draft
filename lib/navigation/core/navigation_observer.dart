@@ -7,10 +7,12 @@ abstract interface class NavigationObserver {
 
 /// LocationObserver keeps current and previous route location.
 ///
-/// [_currentLocation] and [_previousLocation]
-/// is current and previous route [Uri] path.
-/// location updates [stream] can be accessable from any widget via
+/// The [_currentLocation] and [_previousLocation]
+/// is a current and previous route [Uri] path.
+/// 
+/// Location updates [stream] can be accessable from any widget by using
 /// AppRouter.of(context).locationUpdates
+/// 
 class LocationObserver extends NavigationObserver
     with LocationStreamController {
   String? _currentLocation;
@@ -51,9 +53,11 @@ enum LocationUpdateType { pop, push }
 
 /// This allows to listen to location updates
 ///
-/// It can be useful, if you need to rebuild page when navigation updates
-/// (for example when you push another route),
-/// Because router was built to prevent unnecessary rebuilds.
+/// It can be useful, if you want to rebuild page on navigation updates
+/// (for example when you push another route).
+/// 
+/// Because router is designed to prevent unnecessary rebuilds.
+/// 
 mixin LocationStreamController on NavigationObserver {
   final _controller = StreamController<LocationUpdateData>.broadcast();
 

@@ -8,14 +8,19 @@ import 'navigation_stack.dart';
 /// 
 /// This class is using to convert [RouteInformation] to [NavigationStack], and 
 /// get back [NavigationStack] from [RouteInformation].
-/// see [RouteInformationParser]
+/// 
+/// - See [RouteInformationParser]
+/// 
 class CustomRouteInformationParser
     extends RouteInformationParser<NavigationStack> {
   final List<RoutePath> _routes;
   CustomRouteInformationParser(NavigationStack stack) : _routes = stack.routes;
 
   /// Inform router about platfrom updates.
-  /// Takes [RouteInformation] from platform and returns updated [NavigationStack]
+  /// 
+  /// Takes [RouteInformation] from platform and returns 
+  /// updated [NavigationStack].
+  /// 
   @override
   Future<NavigationStack> parseRouteInformation(
       RouteInformation routeInformation) async {
@@ -24,8 +29,10 @@ class CustomRouteInformationParser
   }
 
   /// Inform platform about route configuration updates. 
+  /// 
   /// Takes [NavigationStack] from router and pass updated [RouteInformation] 
-  /// to platform 
+  /// to platform.
+  /// 
   @override
   RouteInformation? restoreRouteInformation(NavigationStack configuration) {
     final RoutePath? activeRoute =

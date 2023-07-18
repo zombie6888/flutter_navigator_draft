@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 /// 
 /// Takes current active tab [index] and listen to index updates.
 /// Takes [tabsLenght] as count of tabs.
+/// 
 class TabStackBuilder extends StatefulWidget {
   final Widget Function(BuildContext context, TabController controller) builder;
   final int index;
@@ -51,8 +52,10 @@ class _TabStackBuilderState extends State<TabStackBuilder>
   /// Update navigation stack when tab index was changed
   /// 
   /// PostFrameCallback prevents stack update while widgets rebuild process, 
-  /// caused by tab switching. 
-  /// See [TabRoutesDelegate._tabIndexUpdateHandler]
+  /// caused by tab switching.
+  ///  
+  /// - See [TabRoutesDelegate._tabIndexUpdateHandler]
+  /// 
   _onChangeTab() {
     if (controller.index != controller.previousIndex) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -77,10 +80,11 @@ class _TabStackBuilderState extends State<TabStackBuilder>
 /// [TabController.animateTo] function is called, which is the only way
 /// to control tab animation. 
 /// 
-/// The purpose of this workaround is to disable animation
-/// when index was changed by router (for example you push route, which 
-/// is nested route of another tab), 
-/// and keep animation remaining when index was changed by user (tapping on tab).
+/// The purpose of this workaround, is to disable animation,
+/// when index was changed by router (push route, which is nested 
+/// route of another tab), and keep animation remaining,
+/// when index was changed by user (tapping on tab).
+/// 
 class CustomTabController extends TabController {
   CustomTabController(
       {required super.length, required super.vsync, super.initialIndex});

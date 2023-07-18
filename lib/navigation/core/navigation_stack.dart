@@ -2,10 +2,16 @@ import 'route_path.dart';
 
 /// Router configuration.
 ///
-/// It contains stack of [routes], see [RoutePath].
-/// [currentIndex] can be used for nested route access. For tab navigation,
-/// currentIndex provide access to routes from current active tab.
-/// [currentLocation] is uri path of active route
+/// It contains stack of [routes]
+/// - see [RoutePath].
+/// 
+/// The [currentIndex] can be used for nested route access. 
+/// 
+/// For tab navigation, currentIndex is using to provide access 
+/// to routes from the current active tab.
+/// 
+/// The [currentLocation] value is the uri path of active route.
+/// 
 class NavigationStack {
   final List<RoutePath> routes;
   final int currentIndex;

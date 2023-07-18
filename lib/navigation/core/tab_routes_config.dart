@@ -8,6 +8,7 @@ import 'route_path.dart';
 import 'tab_routes_delegate.dart';
 
 /// Two-level navigation config for tabs.
+/// 
 class TabRoutesConfig extends RouterConfig<NavigationStack> {
   TabRoutesConfig(
       {required List<RoutePath> routes,

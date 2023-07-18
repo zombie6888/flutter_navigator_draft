@@ -7,29 +7,16 @@ import 'package:flutter/material.dart';
 /// Pass [PlatformDispatcher.instance.defaultRouteName]
 /// to [RouteInformationProvider], which is providing [RouteInformation] from platform.
 /// Useful for deep link support. 
+/// Provides [RouteInformation] to Platform
+/// 
+/// Constructor gets location from [PlatformDispatcher.instance.defaultRouteName]
+/// and pass it to [RouteInfromationParser]. 
+/// 
+/// This adds deep linking support.
+/// 
 class CustomRouteInformationProvider extends PlatformRouteInformationProvider {
   CustomRouteInformationProvider()
       : super(
             initialRouteInformation: RouteInformation(
                 location: PlatformDispatcher.instance.defaultRouteName));
-
-  @override
-  Future<bool> didPushRoute(String route) {
-    // TODO: implement didPushRoute
-    return super.didPushRoute(route);
-  }
-
-  @override
-  Future<bool> didPushRouteInformation(RouteInformation routeInformation) {
-    // TODO: implement didPushRouteInformation
-    return super.didPushRouteInformation(routeInformation);
-  }
-
-  @override
-  void routerReportsNewRouteInformation(RouteInformation routeInformation,
-      {RouteInformationReportingType type =
-          RouteInformationReportingType.none}) {
-    // TODO: implement routerReportsNewRouteInformation
-      super.routerReportsNewRouteInformation(routeInformation, type: type);
-  }
 }

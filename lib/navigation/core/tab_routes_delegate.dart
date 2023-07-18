@@ -99,7 +99,9 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
   ///
   /// [_stack] could be updated either, by [pushNamed] function
   /// or by platform. For example if you come from deep link.
-  /// See [RouterDelegate.setNewRoutePath]
+  /// 
+  /// - See [RouterDelegate.setNewRoutePath]
+  /// 
   @override
   Future<void> setNewRoutePath(NavigationStack configuration) async {
     _previousIndex = _fromDeepLink || _pageWasRedirected
@@ -112,10 +114,10 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
   /// Push page to navigation stack [_stack]
   ///
   /// It will be called when you run
-  /// ```dart
-  /// AppRouter.of(context).pushNamed('page');
+  ///   AppRouter.of(context).pushNamed('page');
   /// or
-  /// AppRouter.of(context).redirect('page');
+  ///   AppRouter.of(context).redirect('page');
+  /// 
   @override
   pushNamed(String path, [bool isRedirect = false]) {
     _fromDeepLink = false;
@@ -182,6 +184,7 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
   /// Update route configuration when active tab [index] is changing.
   ///
   /// This will update [currentLocation] and [index] of active tab route.
+  /// 
   void _tabIndexUpdateHandler(int index) {
     final location = _getRouteLocation(_stack.routes[index]);
     if (location != _stack.currentLocation) {
@@ -196,6 +199,7 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
   /// [AppRouter.navigatorKey] field is using for nested Navigator access.
   /// [AppRouter.routerDelegate] field is using for [TabRoutesDelegate] access.
   /// [AppRouter.routePath] contains current route path.
+  /// 
   AppRouter _createPage(RoutePath route,
       [GlobalKey<NavigatorState>? navigatorKey]) {
     return AppRouter(
@@ -210,6 +214,7 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
   /// Calling when get back from nested page.
   ///
   /// It will remove a nested route from [_stack].
+  /// 
   bool _onPopNestedPage(Route<dynamic> route, dynamic result) {
     if (!route.didPop(result)) {
       return false;
@@ -225,7 +230,7 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
     _stack = _stack.copyWith(routes: rootPaths);
 
     // When pop route, which will pushed from another tab,
-    // it will change active tab index to go back to previous tab
+    // it will change active tab index to go back to previous tab.
     //
     // TODO: make it optional?
     if (!_fromDeepLink &&
@@ -247,6 +252,7 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
   /// Calling when get back from root page.
   ///
   /// It will remove a root route from navigation stack [_stack].
+  /// 
   bool _onPopRootPage(
       Route<dynamic> route, dynamic result, Iterable<Page<dynamic>> pages) {
     if (!route.didPop(result)) {
@@ -281,16 +287,22 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
 
   /// Returns location of parent route
   ///
-  /// if current location is: /tab1.
-  ///                             --/
-  ///                             --...
+  /// if current location is: 
+  ///    /tab1
+  ///      --/
+  ///      --...
   /// result will be: /tab1.
-  /// if current location is: /tab1
-  ///                            --/page1
-  ///                            ...
+  /// 
+  /// if current location is: 
+  ///    /tab1
+  ///      --/page1
+  ///      ...
   /// result will be the same: /tab1.
-  /// if current location is: /page1 (not a nested page opened)
+  /// 
+  /// if current location is: 
+  ///   /page1 (not a nested page opened)
   /// result will be null;
+  /// 
   String? _getParentLocation() {
     final location = _stack.currentLocation;
     final utils = RouteParseUtils(location);

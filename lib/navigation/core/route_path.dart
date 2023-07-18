@@ -2,15 +2,17 @@ import 'package:flutter/widgets.dart';
 
 /// Base class for routes.
 ///
-/// Use [RoutePath.nested] constructor for netsed routes.
+/// Use [RoutePath.branch] constructor for netsed routes.
 /// It supports only two-level navigation but for config like this:
 /// /tab1
 ///   --page1
 ///   --page2
 /// ...
 /// Uri [path] can be like this: /tab1/path/page1, /tab1/../../page2
+/// 
 /// In order to get [RoutePath] from any widget, 
-/// use AppRouter.of(context).routePath.
+/// use: AppRouter.of(context).routePath.
+/// 
 class RoutePath {
   RoutePath(this.path, this.widget,
       {this.queryParams,
@@ -21,9 +23,11 @@ class RoutePath {
       : children = List.unmodifiable(children);
 
   /// Constructor for branch route. Can be used for tab navigation.
+  /// 
   /// If route contains [children] property, it will be treated
   /// as a parent route for a child stack. 
   /// Otherwise it's just a single page route.
+  /// 
   RoutePath.branch(this.path, this.children,
       {this.queryParams, this.params, this.builder})
       : widget = null,
