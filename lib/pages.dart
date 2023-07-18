@@ -10,7 +10,9 @@ class Page6 extends StatelessWidget {
     final router = AppRouter.of(context);
     print('query params: ${router.routePath.queryParams}');
     return Scaffold(
-        appBar: AppBar(title: const Text("page6")),
+        appBar: AppBar(
+            leading: const BackButton(key: ValueKey('back_btn')),
+            title: const Text("page6")),
         body: Center(
           child: Column(
             children: [
@@ -211,6 +213,13 @@ class _HomePageState extends State<HomePage> {
                           child: const Text("to page6",
                               style: TextStyle(fontSize: 22))),
                       TextButton(
+                          key: const ValueKey('btn_tab1_page5'),
+                          onPressed: () {
+                            router.pushNamed('/tab1/page5');
+                          },
+                          child: const Text("/tab1/page5",
+                              style: TextStyle(fontSize: 22))),        
+                      TextButton(
                           key: const ValueKey('btn_tab2_page5'),
                           onPressed: () {
                             router.pushNamed('/tab2/page5');
@@ -255,9 +264,8 @@ class Page4 extends StatelessWidget {
     final router = AppRouter.of(context);
     return Scaffold(
         appBar: AppBar(
-          leading: const BackButton(            
-            key: ValueKey('back_btn')),
-          title: const Text("tab1/page4")),
+            leading: const BackButton(key: ValueKey('back_btn')),
+            title: const Text("tab1/page4")),
         body: Center(
           child: Column(
             children: [
@@ -303,9 +311,8 @@ class Page5 extends StatelessWidget {
     final router = AppRouter.of(context);
     return Scaffold(
         appBar: AppBar(
-          leading: const BackButton(            
-            key: ValueKey('back_btn')),
-          title: const Text("page5")),
+            leading: const BackButton(key: ValueKey('back_btn')),
+            title: const Text("page5")),
         body: Center(
           child: Column(
             children: [
@@ -332,7 +339,9 @@ class Page9 extends StatelessWidget {
   Widget build(BuildContext context) {
     final router = AppRouter.of(context);
     return Scaffold(
-        appBar: AppBar(title: const Text("page9")),
+        appBar: AppBar(
+            leading: const BackButton(key: ValueKey('back_btn')),
+            title: const Text("page9")),
         body: Center(
           child: Column(
             children: [
