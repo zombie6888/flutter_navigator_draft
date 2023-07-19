@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:router_app/navigation/core/custom_route_information_parser.dart';
 import 'package:router_app/navigation/core/navigation_observer.dart';
+import 'package:router_app/navigation/core/route_path.dart';
 import 'package:router_app/navigation/core/tab_routes_config.dart';
 import 'package:router_app/navigation/platform_tabs_page.dart';
 import 'package:router_app/navigation/core/tab_routes_delegate.dart';
+import 'package:router_app/pages.dart';
 
 import 'test_routes.dart';
 
@@ -19,38 +21,42 @@ void main() {
       await tester.pumpWidget(MaterialApp.router(
         routerConfig: config,
       ));
-      await tester.pump();
+      await tester.pumpAndSettle();
     }
 
     setUp(() {
       config = TabRoutesConfig(
           routes: tabRoutes,
+          routeNotFoundPath: RouteNotFoundPath(
+              path: '/not_found', child: const RouteNotFoundPage()),
           observer: LocationObserver(),
           builder: (context, tabRoutes, view, controller) => PlatformTabsPage(
               tabRoutes: tabRoutes, view: view, controller: controller));
     });
     testWidgets('HomeScreen loaded', (WidgetTester tester) async {
       await loadApp(tester);
-      await tester.pumpAndSettle();
       expect(find.text('home'), findsWidgets);
+    });
+    testWidgets('Navigate to page not found', (WidgetTester tester) async {
+      await loadApp(tester);
+      await tester.tap(find.byKey(const Key('btn_route_not_found')));
+      await tester.pumpAndSettle();
+      expect(find.text('404'), findsWidgets);
     });
     testWidgets('Push a single page', (WidgetTester tester) async {
       await loadApp(tester);
-      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('btn_page6')));
       await tester.pumpAndSettle();
       expect(find.text('page6'), findsWidgets);
     });
     testWidgets('Push a tab page', (WidgetTester tester) async {
       await loadApp(tester);
-      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('btn_tab2_page1')));
       await tester.pump();
       expect(find.text('page1'), findsWidgets);
     });
     testWidgets('Push a tab nested page', (WidgetTester tester) async {
       await loadApp(tester);
-      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('btn_tab2_page5')));
       await tester.pump();
       expect(find.text('page5'), findsWidgets);
@@ -58,7 +64,6 @@ void main() {
     testWidgets('Push a tab page, then nested page',
         (WidgetTester tester) async {
       await loadApp(tester);
-      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('btn_tab2_page1')));
       await tester.pump();
       expect(find.text('page1'), findsWidgets);
@@ -68,7 +73,6 @@ void main() {
     });
     testWidgets('Navigate between tabs', (WidgetTester tester) async {
       await loadApp(tester);
-      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('btn_tab2_page1')));
       await tester.pump();
       expect(find.text('page1'), findsWidgets);
@@ -78,7 +82,6 @@ void main() {
     });
     testWidgets('Push redirect page', (WidgetTester tester) async {
       await loadApp(tester);
-      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('btn_tab2_page1')));
       await tester.pump();
       expect(find.text('page1'), findsWidgets);
@@ -92,12 +95,14 @@ void main() {
       await tester.pumpWidget(MaterialApp.router(
         routerConfig: config,
       ));
-      await tester.pump();
+      await tester.pumpAndSettle();
     }
 
     setUp(() {
       config = TabRoutesConfig(
           routes: tabRoutes,
+          routeNotFoundPath: RouteNotFoundPath(
+              path: '/not_found', child: const RouteNotFoundPage()),
           observer: LocationObserver(),
           builder: (context, tabRoutes, view, controller) => PlatformTabsPage(
               tabRoutes: tabRoutes, view: view, controller: controller));
@@ -106,7 +111,6 @@ void main() {
     });
     testWidgets('Pop test', (WidgetTester tester) async {
       await loadApp(tester);
-      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('btn_page6')));
       await tester.pumpAndSettle();
       expect(find.text('page6'), findsWidgets);
@@ -116,7 +120,6 @@ void main() {
     });
     testWidgets('Pop from nested page test', (WidgetTester tester) async {
       await loadApp(tester);
-      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('btn_tab1_page5')));
       await tester.pumpAndSettle();
       expect(find.text('page5'), findsWidgets);
@@ -126,7 +129,6 @@ void main() {
     });
     testWidgets('Navigate between tabs and back', (WidgetTester tester) async {
       await loadApp(tester);
-      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('btn_tab2_page1')));
       await tester.pump();
       expect(find.text('page1'), findsWidgets);
@@ -139,7 +141,6 @@ void main() {
     });
     testWidgets('Navigate to redirect and back', (WidgetTester tester) async {
       await loadApp(tester);
-      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('btn_tab2_page1')));
       await tester.pump();
       expect(find.text('page1'), findsWidgets);
@@ -152,7 +153,6 @@ void main() {
     });
     testWidgets('Pop from from deep link', (WidgetTester tester) async {
       await loadApp(tester);
-      await tester.pumpAndSettle();
       final stack = await parser.parseRouteInformation(
           const RouteInformation(location: '/tab2/page9'));
       await delegate.setNewRoutePath(stack);
@@ -161,6 +161,15 @@ void main() {
       await tester.tap(find.byKey(const Key('back_btn')));
       await tester.pumpAndSettle();
       expect(find.text('page1'), findsWidgets);
+    });
+    testWidgets('Pop from page not found', (WidgetTester tester) async {
+      await loadApp(tester);
+      await tester.tap(find.byKey(const Key('btn_route_not_found')));
+      await tester.pumpAndSettle();
+      expect(find.text('404'), findsWidgets);
+      await tester.tap(find.byKey(const Key('back_btn')));
+      await tester.pumpAndSettle();
+      expect(find.text('home'), findsWidgets);
     });
   });
 }

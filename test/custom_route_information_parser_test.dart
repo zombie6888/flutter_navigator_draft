@@ -6,6 +6,7 @@ import 'package:router_app/navigation/core/navigation_stack.dart';
 import 'package:router_app/navigation/core/route_path.dart';
 import 'package:router_app/navigation/core/tab_routes_config.dart';
 import 'package:router_app/navigation/platform_tabs_page.dart';
+import 'package:router_app/pages.dart';
 
 import 'test_routes.dart';
 
@@ -14,11 +15,14 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   late CustomRouteInformationParser parser;
   RouteInformation? routeInformation;
+  final routeNotFoundPath =
+      RouteNotFoundPath(path: '/not_found', child: const RouteNotFoundPage());
 
   group('CustomRouteInformationParser', () {
     setUp(() {
       config = TabRoutesConfig(
           routes: tabRoutes,
+          routeNotFoundPath: routeNotFoundPath,
           observer: LocationObserver(),
           builder: (context, tabRoutes, view, controller) => PlatformTabsPage(
               tabRoutes: tabRoutes, view: view, controller: controller));
@@ -167,6 +171,11 @@ void main() {
         ]);
         routeInformation = parser.restoreRouteInformation(configuration);
         expect(routeInformation?.location, '/tab1?test=1');
+      });
+      test('Route not found', () async {
+        final configuration = NavigationStack([routeNotFoundPath]);
+        routeInformation = parser.restoreRouteInformation(configuration);
+        expect(routeInformation?.location, '/not_found');
       });
     });
   });

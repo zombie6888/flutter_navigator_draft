@@ -161,13 +161,10 @@ class TabRoutesDelegate extends RouterDelegate<NavigationStack>
 
   @override
   Widget build(BuildContext context) {
+    // TODO: First build occurs before setNewRoutePath called.
+    // Fix this behavior (if posssible) or replace  _routeNotFoundPath.
+    // with splash screen. Ensure that deep links are working.
     final routes = _stack.routes.isEmpty ? [_routeNotFoundPath] : _stack.routes;
-    // if (routes.isEmpty) {
-    //   return _routeNotFoundPath.builder?.call(context) ??
-    //       _routeNotFoundPath.widget ??
-    //       Container();
-    // }
-
     final pages = routes.where((e) => e.children.isEmpty).map(
           (route) => PlatformPageFactory.getPage(child: _createPage(route)),
         );

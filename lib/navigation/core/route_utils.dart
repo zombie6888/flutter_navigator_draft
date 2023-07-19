@@ -11,8 +11,9 @@ class RouteParseUtils {
   /// Target uri
   ///
   late Uri _uri;
+
   /// Default route, when target route not found
-  /// 
+  ///
   late RouteNotFoundPath _routeNotFoundPath;
   RouteParseUtils(String? path, [RouteNotFoundPath? routeNotFoundPath]) {
     assert(path != null, 'not a valid path!');
@@ -66,6 +67,7 @@ class RouteParseUtils {
       }
 
       final stack = rootRoute == null ? rootStack : [...rootStack, rootRoute];
+      // nested route
       return NavigationStack(stack,
           currentIndex: currentIndex, currentLocation: _uri.path);
     }
@@ -82,17 +84,27 @@ class RouteParseUtils {
       }
       branchStack[currentIndex] = currentBranch.copyWith(children: children);
 
-      final stack = rootRoute == null
-          ? (_uri.path == '/'
-              ? branchStack
-              : [...branchStack, _routeNotFoundPath])
-          : [...branchStack, rootRoute];
-
-      return NavigationStack(stack,
-          currentIndex: currentIndex, currentLocation: _uri.path);
+      if (rootRoute == null) {
+        if (_uri.path == '/') {
+          // default route
+          return NavigationStack(branchStack,
+              currentIndex: currentIndex, currentLocation: "/");
+        } else {
+          // route not found
+          return NavigationStack([...branchStack, _routeNotFoundPath],
+              currentIndex: currentIndex,
+              currentLocation: _routeNotFoundPath.path);
+        }
+      } else {
+        // single page route(not a tab)
+        return NavigationStack([...branchStack, rootRoute],
+              currentIndex: currentIndex, currentLocation: _uri.path);
+      }     
     }
 
-    return NavigationStack([_routeNotFoundPath]);
+    // route not found
+    return NavigationStack([_routeNotFoundPath],
+        currentLocation: _routeNotFoundPath.path);
   }
 
   /// Returns updated configaration [NavigationStack]
@@ -132,7 +144,8 @@ class RouteParseUtils {
       }
     }
 
-    return NavigationStack([...routes, _routeNotFoundPath]);
+    return NavigationStack([...routes, _routeNotFoundPath],
+        currentLocation: _routeNotFoundPath.path);
   }
 
   /// Returns routes with only first route in nested stack

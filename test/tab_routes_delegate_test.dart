@@ -6,6 +6,7 @@ import 'package:router_app/navigation/core/route_path.dart';
 import 'package:router_app/navigation/core/tab_routes_config.dart';
 import 'package:router_app/navigation/core/tab_routes_delegate.dart';
 import 'package:router_app/navigation/platform_tabs_page.dart';
+import 'package:router_app/pages.dart';
 
 import 'test_routes.dart';
 
@@ -14,11 +15,14 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   late TabRoutesDelegate delegate;
   late CustomRouteInformationParser parser;
+  final routeNotFoundPath =
+      RouteNotFoundPath(path: '/not_found', child: const RouteNotFoundPage());
 
   group('TabRoutesDelegate', () {
     setUp(() {
       config = TabRoutesConfig(
           routes: tabRoutes,
+          routeNotFoundPath: routeNotFoundPath,
           observer: LocationObserver(),
           builder: (context, tabRoutes, view, controller) => PlatformTabsPage(
               tabRoutes: tabRoutes, view: view, controller: controller));
@@ -236,7 +240,12 @@ void main() {
         //expect(delegate.currentConfiguration?.routes.length, 4);
         expect(delegate.currentConfiguration?.routes.last,
             RoutePath('/page6', null));
-        expect(delegate.currentConfiguration?.currentLocation, '/page6');    
+        expect(delegate.currentConfiguration?.currentLocation, '/page6');
+      });
+      test('Push route not found route', () async {
+        await delegate.pushNamed('/fakeroute');
+        expect(delegate.currentConfiguration?.routes.last, routeNotFoundPath);
+        expect(delegate.currentConfiguration?.currentLocation, '/not_found');
       });
     });
     group('Set route from platform', () {
@@ -272,6 +281,13 @@ void main() {
         expect(delegate.currentConfiguration?.currentIndex, 2);
         expect(delegate.currentConfiguration?.currentLocation,
             '/tab3/nestedtest/page7');
+      });
+      test('Deep link with unknown route', () async {
+        final stack = await parser.parseRouteInformation(
+            const RouteInformation(location: '/fakeroute'));
+        await delegate.setNewRoutePath(stack);
+        expect(delegate.currentConfiguration?.routes.last, routeNotFoundPath);
+        expect(delegate.currentConfiguration?.currentLocation, '/not_found');
       });
     });
   });
